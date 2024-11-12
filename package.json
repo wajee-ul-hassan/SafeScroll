@@ -1,0 +1,24 @@
+{
+  "name": "safescroll",
+  "version": "1.0.0",
+  "description": "An extension to blur Hateful Memes",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "build": "node build.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cookie-parser": "^1.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.10.0",
+    "mongoose": "^8.8.1",
+    "nodemailer": "^6.9.16"
+  }
+}

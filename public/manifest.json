@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Hateful Meme Blocker",
+  "version": "1.0",
+  "description": "Blurs hateful memes by detecting and filtering flagged images in the DOM.",
+  "permissions": ["storage", "activeTab", "scripting", "tabs"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_icon": "logo192.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "192": "logo192.png",
+    "512": "logo512.png"
+  }
+}
