@@ -32,6 +32,7 @@ copyFile(path.join(__dirname, "public", "logo512.png"), path.join(buildDir, "log
 copyFile(path.join(__dirname, "public", "background.js"), path.join(buildDir, "background.js"));
 copyFile(path.join(__dirname, "public", "content.js"), path.join(buildDir, "content.js"));
 copyFile(path.join(__dirname, "views", "index.ejs"), path.join(buildDir, "index.ejs"));
+copyFile(path.join(__dirname, "public", "popup.html"), path.join(buildDir, "popup.html"));
 
 // Copy entire folders
 // copyFolderSync(path.join(__dirname, "public"), path.join(buildDir, "public"));

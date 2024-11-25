@@ -6,6 +6,7 @@
   "permissions": ["storage", "activeTab", "scripting", "tabs"],
   "host_permissions": ["<all_urls>"],
   "action": {
+    "default_popup": "popup.html",
     "default_icon": "logo192.png"
   },
   "content_scripts": [
@@ -20,7 +21,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["*"],
+      "resources": ["public/*"],
       "matches": ["<all_urls>"]
     }
   ],
