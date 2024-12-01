@@ -50,7 +50,7 @@ async function signinFORM(event) {
         });
 
         if (!response.ok) throw new Error('Failed to submit form');
-        window.location.href = '/subscribe'; 
+        window.location.href = '/'; 
     } catch (error) {
     console.error('Error:', error);
     alert('wrong credentials');

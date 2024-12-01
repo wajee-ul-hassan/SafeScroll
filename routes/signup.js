@@ -4,13 +4,18 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const { getTempUserStore } = require('./email'); // Import the function to get tempUserStore
-const User = require('../models/user'); // Adjust the path as necessary
+const User = require('../models/user');
 
 // Utilize the tempUserStore from email route
 const tempUserStore = getTempUserStore();
 
 router.post("/", async (req, res) => {
     const { username, email, password } = req.body;
+
+    // Validate input fields
+    if (!username || !email || !password) {
+        return res.status(400).send("All fields are required.");
+    }
 
     try {
         // Check if the username already exists
@@ -25,7 +30,9 @@ router.post("/", async (req, res) => {
             return res.status(400).send('Email already exists.');
         }
 
+        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
+
         const verificationToken = crypto.randomBytes(20).toString('hex');
 
         // Temporarily store user info
@@ -33,7 +40,7 @@ router.post("/", async (req, res) => {
             username,
             email,
             password: hashedPassword,
-            verificationTokenExpiry: Date.now() + 360000000, // 1 hour expiry
+            verificationTokenExpiry: Date.now() + 3600000, // 1 hour expiry
         };
 
         // Send verification email
@@ -43,7 +50,7 @@ router.post("/", async (req, res) => {
                 user: 'f219298@cfd.nu.edu.pk',
                 pass: 'lucky031671660371#'
             },
-            tls : { rejectUnauthorized: false }
+            tls: { rejectUnauthorized: false }
         });
 
         const mailOptions = {
@@ -61,7 +68,6 @@ router.post("/", async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
-
 
 router.get('/', (req, res) => {
     res.render('signup');

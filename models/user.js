@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 
 // Define user schema
@@ -16,6 +15,16 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    subscription: {
+        startDate: {
+            type: Date,
+            default: null // Default to null when the user has no subscription
+        },
+        endDate: {
+            type: Date,
+            default: null
+        }
     }
 });
 

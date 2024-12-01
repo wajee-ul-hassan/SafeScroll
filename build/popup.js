@@ -1,15 +1,23 @@
-// Attach event listener for subscription button
 document.addEventListener('DOMContentLoaded', () => {
     const buySubscriptionButton = document.getElementById('buySubscription');
+    const signin = document.getElementById('signin');
 
     if (buySubscriptionButton) {
-        console.log("Clicked");
         buySubscriptionButton.addEventListener('click', () => {
-            // Send a message to the background script to open the subscription page
-            chrome.runtime.sendMessage({ action: 'openSigninPage' });
+            chrome.runtime.sendMessage({ action: 'openSubsPage' }, (response) => {
+            });
+        });
+    }
+
+    if (signin) {
+        signin.addEventListener('click', () => {
+            chrome.runtime.sendMessage({ action: 'opensigninPage' }, (response) => {
+            });
         });
     }
 });
+
+
 
 // document.addEventListener("DOMContentLoaded", () => {
 //     const switchElement = document.getElementById("enableExtensionSwitch");
