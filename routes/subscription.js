@@ -2,7 +2,7 @@ const express = require("express");
 const authenticateToken = require('../middlewares/auth');
 const cookieParser = require('cookie-parser');
 const stripe = require("stripe")("sk_test_51QP5HeP0df5kgPelNQGK7TSyvBmOBu5fQAwUmWTHVsMbg7h4xtmPgLL6fCcsyGYRrjektNxbB5dGqKmxe4xmIBOr00kDdGTjs0");
-const User=require('../models/user');
+const User = require('../models/user');
 
 const router = express.Router();
 let username;
@@ -16,7 +16,7 @@ router.get("/", authenticateToken, (req, res) => {
       stripePublicKey: "pk_test_51QP5HeP0df5kgPel0wdS65oClsAydXltNxMNgUSqFXg9AQKKGq97S6ROthklCR3bIpqVStB2DRfSKH8fMScH8dGj00kMlRNSKv",
     });
   } else {
-    res.render("signin"); // Corrected typo here
+    res.render("signin");
   }
 });
 
@@ -37,8 +37,14 @@ router.post("/create-checkout-session", authenticateToken, async (req, res) => {
     });
     res.redirect(303, session.url);
   } catch (error) {
-    console.error("Stripe Error:", error);
-    res.status(500).send("An error occurred");
+    errorTitle = "Error 500";
+    errorMessage = "Internal Server Error."
+    statusCode = 500;
+    res.status(statusCode).render('error', {
+      error_title: errorTitle,
+      status_code: statusCode,
+      error: errorMessage
+    });
   }
 });
 
@@ -46,7 +52,14 @@ router.get("/success", async (req, res) => {
   try {
     const user = await User.findOne({ username: username });
     if (!user) {
-      return res.status(404).send("User not found");
+      errorTitle = "Error 404";
+      errorMessage = "User not found."
+      statusCode = 404;
+      return res.status(statusCode).render('error', {
+        error_title: errorTitle,
+        status_code: statusCode,
+        error: errorMessage
+      });
     }
 
     // Set subscription start and end dates
@@ -63,8 +76,14 @@ router.get("/success", async (req, res) => {
 
     res.redirect("/dashboard"); // Redirect to dashboard after subscription
   } catch (error) {
-    console.error("Subscription Update Error:", error);
-    res.status(500).send("An error occurred while updating subscription");
+    errorTitle = "Error 500";
+    errorMessage = "An error occurred while updating subscription"
+    statusCode = 500;
+    res.status(statusCode).render('error', {
+      error_title: errorTitle,
+      status_code: statusCode,
+      error: errorMessage
+    });
   }
 });
 

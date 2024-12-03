@@ -30,12 +30,19 @@ router.get('/', (req, res) => {
 
 router.post('/', async (req, res) => {
     const { username, email } = req.body;
-    console.log("username and email are : ",{username,email})
+    console.log("username and email are : ", { username, email })
     try {
         // Check if the user exists
         const user = await User.findOne({ username, email });
         if (!user) {
-            return res.status(400).send('User with this username and email does not exist.');
+            errorTitle = "Error 400";
+            errorMessage = "Username and Email does not exist."
+            statusCode = 400;
+            return res.status(statusCode).render('error', {
+                error_title: errorTitle,
+                status_code: statusCode,
+                error: errorMessage
+            });
         }
 
         // Generate a new random password
@@ -68,10 +75,15 @@ router.post('/', async (req, res) => {
         // Redirect to sign in page with success message
         res.status(200).send('<script>alert("Password reset successful. Please check your email for the new password."); window.location.href="/signin";</script>');
     } catch (error) {
-        console.error('Error during password reset:', error);
-        res.status(500).send('Internal Server Error');
+        errorTitle = "Error 500";
+        errorMessage = "Internal Server Error."
+        statusCode=500;
+        res.status(statusCode).render('error', {
+            error_title: errorTitle,
+            status_code: statusCode,
+            error: errorMessage
+        });
     }
 });
 
 module.exports = router;
- 

@@ -12,22 +12,31 @@ router.get('/', (req, res) => {
 router.post("/", async (req, res) => {
     const { username, email, password } = req.body;
     const token = req.cookies.token;
-    // Validate input fields
-    if (!username || !email || !password) {
-        return res.status(400).send("All fields are required.");
-    }
-
     try {
         // Check if the username already exists
         const existingUsername = await User.findOne({ username });
         if (existingUsername) {
-            return res.status(400).send('Username already exists.');
+            errorTitle = "Error 400";
+            errorMessage = "Username already exists."
+            statusCode = 400;
+            return res.status(statusCode).render('error', {
+                error_title: errorTitle,
+                status_code: statusCode,
+                error: errorMessage
+            });
         }
 
         // Check if the email already exists
         const existingEmail = await User.findOne({ email });
         if (existingEmail) {
-            return res.status(400).send('Email already exists.');
+            errorTitle = "Error 400";
+            errorMessage = "Email already exists."
+            statusCode = 400;
+            return res.status(statusCode).render('error', {
+                error_title: errorTitle,
+                status_code: statusCode,
+                error: errorMessage
+            });
         }
         const jwt = require('jsonwebtoken');
 
@@ -78,8 +87,14 @@ router.post("/", async (req, res) => {
         console.log("OTP email sent successfully, rendering email page...");
         res.redirect(`/email-page?email=${encodeURIComponent(email)}`);
     } catch (error) {
-        console.error('Error during signup:', error);
-        res.status(500).send('Internal Server Error');
+        errorTitle = "Error 500";
+        errorMessage = "Internal Server Error."
+        statusCode = 500;
+        res.status(statusCode).render('error', {
+            error_title: errorTitle,
+            status_code: statusCode,
+            error: errorMessage
+        });
     }
 });
 

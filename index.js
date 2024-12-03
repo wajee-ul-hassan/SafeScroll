@@ -11,7 +11,8 @@ const signupRouter = require('./routes/signup');
 const emailRouter = require('./routes/email');
 const forgetpasswordRouter = require('./routes/forgetpassword'); // Destructure to get the router
 const subscriptionRouter = require('./routes/subscription');
-const dashboardRouter=require('./routes/dashboard')
+const dashboardRouter=require('./routes/dashboard');
+const errorRouter = require('./routes/error');
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/email-page', emailRouter);
 app.use('/forgetpassword',forgetpasswordRouter);
 app.use('/subscribe', subscriptionRouter);
 app.use('/dashboard',dashboardRouter);
+app.use('/error',errorRouter)
 
 
 app.get("/", (req, res) => {

@@ -7,12 +7,21 @@ const nodemailer = require('nodemailer');
 
 // Endpoint to render the email page
 router.get('/', isAuthorized, (req, res) => {
-    // const email = req.query.email; // Extract the email from the query string
-    // console.log("Redirected");
-    // console.log(email);
-    // email ? res.render('signin') : res.status(400).send('Email not provided');
-    const email = "afaqshahbaz06@gmail.com";
-    res.render('emailpage', { userEmail: email });
+    const email = req.query.email; // Extract the email from the query string
+    console.log("Redirected");
+    console.log(email);
+    if (email) {
+        res.render('emailpage')
+    }
+    else {
+        errorTitle="Error 400";
+        errorMessage="Trying to access page without authorization."
+        res.status(statusCode).render('error', {
+            error_title: errorTitle,
+            status_code: statusCode,
+            error: errorMessage
+        });
+    }
 });
 
 router.post("/verify-otp", isAuthorized, async (req, res) => {
@@ -103,8 +112,14 @@ router.post("/resend-otp", isAuthorized, async (req, res) => {
             </script>
         `);
     } catch (error) {
-        console.error("Resend OTP Error:", error);
-        res.status(500).send("An error occurred while resending the OTP.");
+        errorTitle="Error 500";
+        errorMessage="An error occurred while resending the OTP."
+        statusCode=500;
+        res.status(statusCode).render('error', {
+            error_title: errorTitle,
+            status_code: statusCode,
+            error: errorMessage
+        });
     }
 });
 
