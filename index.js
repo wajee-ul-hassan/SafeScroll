@@ -8,7 +8,7 @@ const stripe = require("stripe")("sk_test_51QP5HeP0df5kgPelNQGK7TSyvBmOBu5fQAwUm
 // Import your route modules
 const signinRouter = require('./routes/signin');
 const signupRouter = require('./routes/signup');
-const { router: emailRouter } = require('./routes/email'); // Destructure to get the router
+const emailRouter = require('./routes/email');
 const forgetpasswordRouter = require('./routes/forgetpassword'); // Destructure to get the router
 const subscriptionRouter = require('./routes/subscription');
 const dashboardRouter=require('./routes/dashboard')

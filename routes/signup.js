@@ -1,17 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const { getTempUserStore } = require('./email'); // Import the function to get tempUserStore
 const User = require('../models/user');
 
-// Utilize the tempUserStore from email route
-const tempUserStore = getTempUserStore();
+
+router.get('/', (req, res) => {
+    res.render('signup');
+});
 
 router.post("/", async (req, res) => {
     const { username, email, password } = req.body;
-
+    const token = req.cookies.token;
     // Validate input fields
     if (!username || !email || !password) {
         return res.status(400).send("All fields are required.");
@@ -29,48 +29,58 @@ router.post("/", async (req, res) => {
         if (existingEmail) {
             return res.status(400).send('Email already exists.');
         }
+        const jwt = require('jsonwebtoken');
 
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
+        if (!token) {
+            const token = jwt.sign({ email }, 'Nevergiveup', { expiresIn: '1h' });
+            res.cookie('token', token, { httpOnly: true, secure: true, maxAge: 3600000 });
+        }
+        // Generate a 4-digit OTP
+        // const otp = Math.floor(1000 + Math.random() * 9000).toString(); // Random 4-digit number
+        // const otpExpiry = Date.now() + 600000; // 10 minutes expiry
 
-        const verificationToken = crypto.randomBytes(20).toString('hex');
+        // // Create and save the new user with OTP and verification fields
+        // const newUser = new User({
+        //     username,
+        //     email,
+        //     password: hashedPassword,
+        //     otp,
+        //     otpExpiry,
+        //     isVerified: false,
+        // });
 
-        // Temporarily store user info
-        tempUserStore[verificationToken] = {
-            username,
-            email,
-            password: hashedPassword,
-            verificationTokenExpiry: Date.now() + 3600000, // 1 hour expiry
-        };
+        // await newUser.save();
 
-        // Send verification email
-        const transporter = nodemailer.createTransport({
-            service: 'Gmail',
-            auth: {
-                user: 'f219298@cfd.nu.edu.pk',
-                pass: 'lucky031671660371#'
-            },
-            tls: { rejectUnauthorized: false }
-        });
+        // // Send verification email
+        // const transporter = nodemailer.createTransport({
+        //     service: 'Gmail',
+        //     auth: {
+        //         user: 'f219298@cfd.nu.edu.pk',
+        //         pass: 'lucky031671660371#'
+        //     },
+        //     tls: { rejectUnauthorized: false }
+        // });
 
-        const mailOptions = {
-            from: 'f219298@cfd.nu.edu.pk',
-            to: email,
-            subject: 'Email Verification',
-            text: `Please verify your email by clicking the following link: 
-            http://${req.headers.host}/email-page/verify-email?token=${verificationToken}`,
-        };
+        // const mailOptions = {
+        //     from: 'f219298@cfd.nu.edu.pk',
+        //     to: email,
+        //     subject: 'Your OTP for Email Verification',
+        //     html: `
+        //     <p>Your OTP for email verification is: <strong>${otp}</strong>.</p>
+        //     <p>The OTP is valid for 10 minutes.</p>
+        // `,
+        // };
 
-        await transporter.sendMail(mailOptions);
-        res.status(200).send('Signup successful. Please check your email for verification.');
+        // await transporter.sendMail(mailOptions);
+        // Render the email page after sending the OTP email
+        console.log("OTP email sent successfully, rendering email page...");
+        res.redirect(`/email-page?email=${encodeURIComponent(email)}`);
     } catch (error) {
         console.error('Error during signup:', error);
         res.status(500).send('Internal Server Error');
     }
-});
-
-router.get('/', (req, res) => {
-    res.render('signup');
 });
 
 module.exports = router;

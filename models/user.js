@@ -25,6 +25,18 @@ const userSchema = new mongoose.Schema({
             type: Date,
             default: null
         }
+    },
+    isVerified: {
+        type: Boolean,
+        default: false // To track whether the email is verified
+    },
+    otp: {
+        type: String, // Store the OTP temporarily
+        default: null
+    },
+    otpExpiry: {
+        type: Date, // To track when the OTP expires
+        default: null
     }
 });
 

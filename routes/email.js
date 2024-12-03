@@ -1,50 +1,112 @@
-// /routes/email.js
 const express = require('express');
 const router = express.Router();
-const User = require('../models/user'); // Adjust the path as necessary
+const User = require('../models/user');
+const isAuthorized = require('../middlewares/verify-signup');
+const nodemailer = require('nodemailer');
 
-// In-memory store for unverified users
-let tempUserStore = {};
-
-// This function allows access to the tempUserStore in other files if needed
-function getTempUserStore() {
-  return tempUserStore;
-}
 
 // Endpoint to render the email page
-router.get('/', (req, res) => {
-    res.render('emailpage');
+router.get('/', isAuthorized, (req, res) => {
+    // const email = req.query.email; // Extract the email from the query string
+    // console.log("Redirected");
+    // console.log(email);
+    // email ? res.render('signin') : res.status(400).send('Email not provided');
+    const email = "afaqshahbaz06@gmail.com";
+    res.render('emailpage', { userEmail: email });
 });
 
-// Endpoint to handle email verification
-router.get('/verify-email', async (req, res) => {
-    try {
-        const { token } = req.query;
-        const tempUser = tempUserStore[token];
+router.post("/verify-otp", isAuthorized, async (req, res) => {
+    const { otp } = req.body;
 
-        if (!tempUser || tempUser.verificationTokenExpiry < Date.now()) {
-            return res.status(400).send('Invalid or expired token');
+    try {
+        const user = await User.findOne({ otp });
+
+        if (!user) {
+            return res.status(400).send(`
+                <script>
+                    alert("Invalid OTP! Please try again.");
+                    window.history.back();
+                </script>
+            `);
         }
 
-        // Create new user in the database
-        const newUser = new User({
-            username: tempUser.username,
-            email: tempUser.email,
-            password: tempUser.password
-        });
+        // Check if the OTP has expired
+        if (Date.now() > user.otpExpiry) {
+            return res.status(400).send(`
+                <script>
+                    alert("OTP has expired! Please request a new OTP.");
+                    window.history.back();
+                </script>
+            `);
+        }
 
-        await newUser.save();
+        // Mark the user as verified and clear OTP and OTP expiry
+        user.isVerified = true;
+        user.otp = null;
+        user.otpExpiry = null;
+        await user.save();
 
-        // Remove user from temporary storage
-        delete tempUserStore[token];
-
-         // Redirect to the sign-in page
-        res.redirect('/signin?closed=true');
-
+        // Redirect to sign-in page
+        res.redirect("/signin");
     } catch (error) {
-        console.error('Error verifying email:', error);
-        res.status(500).send('Internal Server Error');
+        console.error("OTP Verification Error:", error);
+        res.status(500).send("An error occurred during OTP verification.");
     }
 });
 
-module.exports = { router, getTempUserStore };
+router.post("/resend-otp", isAuthorized, async (req, res) => {
+    try {
+        const userEmail = req.body.email;
+        console.log(userEmail);
+        const user = await User.findOne({ email: userEmail });
+
+        if (!user) {
+            return res.status(400).send(`
+                <script>
+                    alert("User not found. Please sign up again.");
+                    window.history.back();
+                </script>
+            `);
+        }
+
+        // Generate a new OTP
+        const newOtp = Math.floor(1000 + Math.random() * 9000);
+        user.otp = newOtp;
+        user.otpExpiry = Date.now() + 600000; // 10 minutes expiry
+        await user.save();
+
+        // Send the new OTP via email
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: 'f219298@cfd.nu.edu.pk',
+                pass: 'lucky031671660371#'
+            },
+            tls: { rejectUnauthorized: false }
+        });
+
+        const mailOptions = {
+            from: 'f219298@cfd.nu.edu.pk',
+            to: userEmail,
+            subject: 'Your New OTP for Email Verification',
+            html: `
+                <p>Your new OTP for email verification is: <strong>${newOtp}</strong>.</p>
+                <p>The OTP is valid for 10 minutes.</p>
+            `,
+        };
+
+        await transporter.sendMail(mailOptions);
+        res.status(200).send(`
+            <script>
+                alert("A new OTP has been sent to your email.");
+                window.location.href = "/email-page";
+            </script>
+        `);
+    } catch (error) {
+        console.error("Resend OTP Error:", error);
+        res.status(500).send("An error occurred while resending the OTP.");
+    }
+});
+
+
+module.exports = router;
