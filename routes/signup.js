@@ -46,7 +46,7 @@ router.post("/", async (req, res) => {
             const token = jwt.sign({ email }, 'Nevergiveup', { expiresIn: '1h' });
             res.cookie('token', token, { httpOnly: true, secure: true, maxAge: 3600000 });
         }
-        // Generate a 4-digit OTP
+        // // Generate a 4-digit OTP
         // const otp = Math.floor(1000 + Math.random() * 9000).toString(); // Random 4-digit number
         // const otpExpiry = Date.now() + 600000; // 10 minutes expiry
 
@@ -83,7 +83,7 @@ router.post("/", async (req, res) => {
         // };
 
         // await transporter.sendMail(mailOptions);
-        // Render the email page after sending the OTP email
+        // // Render the email page after sending the OTP email
         console.log("OTP email sent successfully, rendering email page...");
         res.redirect(`/email-page?email=${encodeURIComponent(email)}`);
     } catch (error) {

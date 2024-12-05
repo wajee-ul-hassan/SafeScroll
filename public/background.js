@@ -1,51 +1,52 @@
-let popupWindowId = null; // Store the popup window ID
+let openedTabId = null; // Store the tab ID
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  const popupConfig = {
-    type: "popup",
-    width: 800,
-    height: 600,
-  };
+  const subscribeUrl = "http://localhost:3000/subscribe";
+  const signinUrl = "http://localhost:3000/signin";
 
   if (message.action === 'openSubsPage') {
-    const url = "http://localhost:3000/subscribe";
-    handlePopup(url, popupConfig, sendResponse);
+    openTab(subscribeUrl, sendResponse);
   } else if (message.action === 'opensigninPage') {
-    const url = "http://localhost:3000/signin";
-    handlePopup(url, popupConfig, sendResponse);
+    openTab(signinUrl, sendResponse);
   }
+  return true;
 });
 
-// Function to handle popup creation and reuse
-function handlePopup(url, config, sendResponse) {
-  if (popupWindowId) {
-    // Update the existing popup window
-    chrome.windows.update(popupWindowId, { focused: true }, () => {
-      chrome.tabs.query({ windowId: popupWindowId }, (tabs) => {
-        if (tabs && tabs.length > 0) {
-          // Update the URL of the first tab in the popup
-          chrome.tabs.update(tabs[0].id, { url });
-        }
-      });
+// Function to handle tab creation and reuse
+function openTab(url, sendResponse) {
+  if (openedTabId) {
+    // Check if the tab is still open
+    chrome.tabs.get(openedTabId, (tab) => {
+      if (chrome.runtime.lastError || !tab) {
+        // If the tab is closed or not accessible, open a new one
+        createTab(url, sendResponse);
+      } else {
+        // If the tab is open, update its URL and focus it
+        chrome.tabs.update(openedTabId, { url, active: true });
+        sendResponse({ status: "Updated existing tab" });
+      }
     });
   } else {
-    // Create a new popup window
-    chrome.windows.create({ ...config, url }, (window) => {
-      popupWindowId = window.id;
-      console.log("Popup window created with ID:", popupWindowId);
-    });
+    // Create a new tab
+    createTab(url, sendResponse);
   }
-
-  sendResponse({ status: "Success" });
 }
 
-// Listen for window close event to reset popupWindowId
-chrome.windows.onRemoved.addListener((windowId) => {
-  if (windowId === popupWindowId) {
-    popupWindowId = null;
+// Helper function to create a new tab
+function createTab(url, sendResponse) {
+  chrome.tabs.create({ url, active: true }, (tab) => {
+    openedTabId = tab.id;
+    console.log("Tab created with ID:", openedTabId);
+    sendResponse({ status: "Success", tabId: openedTabId });
+  });
+}
+
+// Listen for tab close event to reset openedTabId
+chrome.tabs.onRemoved.addListener((tabId) => {
+  if (tabId === openedTabId) {
+    openedTabId = null;
   }
 });
-
 
 // chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 //   if (message.action === "processImages" && message.data) {

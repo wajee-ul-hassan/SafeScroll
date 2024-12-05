@@ -8,14 +8,14 @@ const nodemailer = require('nodemailer');
 // Endpoint to render the email page
 router.get('/', isAuthorized, (req, res) => {
     const email = req.query.email; // Extract the email from the query string
-    console.log("Redirected");
     console.log(email);
     if (email) {
-        res.render('emailpage')
+        res.render('emailpage', { userEmail: email });
     }
     else {
-        errorTitle="Error 400";
-        errorMessage="Trying to access page without authorization."
+        errorTitle = "Error 400";
+        errorMessage = "Trying to access page without authorization.";
+        statusCode=400;
         res.status(statusCode).render('error', {
             error_title: errorTitle,
             status_code: statusCode,
@@ -112,9 +112,9 @@ router.post("/resend-otp", isAuthorized, async (req, res) => {
             </script>
         `);
     } catch (error) {
-        errorTitle="Error 500";
-        errorMessage="An error occurred while resending the OTP."
-        statusCode=500;
+        errorTitle = "Error 500";
+        errorMessage = "An error occurred while resending the OTP."
+        statusCode = 500;
         res.status(statusCode).render('error', {
             error_title: errorTitle,
             status_code: statusCode,

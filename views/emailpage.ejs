@@ -21,14 +21,14 @@
                 </p>
                 <form id="otpForm" action="/email-page/verify-otp" method="POST">
                     <div class="mb-3">
-                        <input type="hidden" name="email" id="emailInput" value="<%= userEmail %>">
+                        <input type="hidden" name="email" id="emailInput" value="<%=userEmail%>">
                         <input type="text" class="form-control text-center otp-input" name="otp" maxlength="4"
                             placeholder="Enter OTP" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Verify</button>
                 </form>
                 <form id="resendOtpForm" action="/email-page/resend-otp" method="POST" class="mt-3">
-                    <input type="hidden" name="email" id="emailInputResend" value="<%= userEmail %>">
+                    <input type="hidden" name="email" id="emailInputResend" value="<%=userEmail%>">
                     <button type="submit" class="btn btn-secondary w-100">Resend OTP</button>
                 </form>
             </div>
