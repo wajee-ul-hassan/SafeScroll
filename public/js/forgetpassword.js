@@ -55,11 +55,10 @@ async function forgetpassword(event) {
                 window.location.href = "/signin";
             } else {
                 const error = await response.text();
-                alert(error);
+                showDangerAlert(`${error}`);
             }
         } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            showDangerAlert('An Error Occurred');
         }
     }
  

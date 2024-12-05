@@ -30,7 +30,6 @@ router.get('/', (req, res) => {
 
 router.post('/', async (req, res) => {
     const { username, email } = req.body;
-    console.log("username and email are : ", { username, email })
     try {
         // Check if the user exists
         const user = await User.findOne({ username, email });

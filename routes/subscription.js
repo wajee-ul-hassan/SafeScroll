@@ -10,7 +10,6 @@ let username;
 // Render the subscription page
 router.get("/", authenticateToken, (req, res) => {
   username = req.user ? req.user.username : undefined; // Ensure req.user is checked before accessing username
-  console.log(username);
   if (username) {
     res.render("subscription", {
       stripePublicKey: "pk_test_51QP5HeP0df5kgPel0wdS65oClsAydXltNxMNgUSqFXg9AQKKGq97S6ROthklCR3bIpqVStB2DRfSKH8fMScH8dGj00kMlRNSKv",

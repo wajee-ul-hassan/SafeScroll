@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const stripe = require("stripe")("sk_test_51QP5HeP0df5kgPelNQGK7TSyvBmOBu5fQAwUmWTHVsMbg7h4xtmPgLL6fCcsyGYRrjektNxbB5dGqKmxe4xmIBOr00kDdGTjs0");
-
 // Import your route modules
 const signinRouter = require('./routes/signin');
 const signupRouter = require('./routes/signup');
@@ -26,8 +25,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Middleware to parse JSON and form data
+app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 

@@ -46,46 +46,48 @@ router.post("/", async (req, res) => {
             const token = jwt.sign({ email }, 'Nevergiveup', { expiresIn: '1h' });
             res.cookie('token', token, { httpOnly: true, secure: true, maxAge: 3600000 });
         }
-        // // Generate a 4-digit OTP
-        // const otp = Math.floor(1000 + Math.random() * 9000).toString(); // Random 4-digit number
-        // const otpExpiry = Date.now() + 600000; // 10 minutes expiry
+        // Generate a 4-digit OTP
+        const otp = Math.floor(1000 + Math.random() * 9000).toString(); // Random 4-digit number
+        const otpExpiry = Date.now() + 600000; // 10 minutes expiry
 
-        // // Create and save the new user with OTP and verification fields
-        // const newUser = new User({
-        //     username,
-        //     email,
-        //     password: hashedPassword,
-        //     otp,
-        //     otpExpiry,
-        //     isVerified: false,
-        // });
+        // Create and save the new user with OTP and verification fields
+        const newUser = new User({
+            username,
+            email,
+            password: hashedPassword,
+            otp,
+            otpExpiry,
+            isVerified: false,
+        });
 
-        // await newUser.save();
+        await newUser.save();
 
-        // // Send verification email
-        // const transporter = nodemailer.createTransport({
-        //     service: 'Gmail',
-        //     auth: {
-        //         user: 'f219298@cfd.nu.edu.pk',
-        //         pass: 'lucky031671660371#'
-        //     },
-        //     tls: { rejectUnauthorized: false }
-        // });
+        // Send verification email
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: 'f219298@cfd.nu.edu.pk',
+                pass: 'lucky031671660371#'
+            },
+            tls: { rejectUnauthorized: false }
+        });
 
-        // const mailOptions = {
-        //     from: 'f219298@cfd.nu.edu.pk',
-        //     to: email,
-        //     subject: 'Your OTP for Email Verification',
-        //     html: `
-        //     <p>Your OTP for email verification is: <strong>${otp}</strong>.</p>
-        //     <p>The OTP is valid for 10 minutes.</p>
-        // `,
-        // };
+        const mailOptions = {
+            from: 'f219298@cfd.nu.edu.pk',
+            to: email,
+            subject: 'Your OTP for Email Verification',
+            html: `
+            <p>Your OTP for email verification is: <strong>${otp}</strong>.</p>
+            <p>The OTP is valid for 10 minutes.</p>
+        `,
+        };
 
-        // await transporter.sendMail(mailOptions);
-        // // Render the email page after sending the OTP email
-        console.log("OTP email sent successfully, rendering email page...");
-        res.redirect(`/email-page?email=${encodeURIComponent(email)}`);
+        await transporter.sendMail(mailOptions);
+        // Render the email page after sending the OTP email
+        res.status(200).json({
+            message: 'Signup successful. Please check your email for verification.',
+            email: email
+        });        
     } catch (error) {
         errorTitle = "Error 500";
         errorMessage = "Internal Server Error."

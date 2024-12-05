@@ -52,16 +52,23 @@ async function submitForm(event) {
             },
             body: JSON.stringify(formObject)
         });
-        // if (response.status === 400) {
-        //     const errorMessage = await response.text();
-        //     alert(errorMessage);
-        //     return;
-        // }
-        // if (!response.ok) throw new Error('Failed to submit form');
-        // window.location.href='/email-page';
+
+        if (!response.ok) {
+            if (response.status === 400) {
+                const errorData = await response.json(); // Parse the JSON response
+                showDangerAlert(`${errorData.message}`);
+                return;
+            }
+            throw new Error('Failed to submit form');
+        }
+
+        // Parse the JSON response if status is 200
+        const data = await response.json();
+
+        // Redirect to the email page and pass the email in the URL
+        window.location.href = `/email-page?email=${encodeURIComponent(data.email)}`;
     } catch (error) {
-        console.error('Error:', error.message);
-        alert('An error occurred while signing up');
+        showDangerAlert('An error occurred while signing up');
     }
 
 }

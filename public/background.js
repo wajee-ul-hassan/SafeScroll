@@ -36,7 +36,6 @@ function openTab(url, sendResponse) {
 function createTab(url, sendResponse) {
   chrome.tabs.create({ url, active: true }, (tab) => {
     openedTabId = tab.id;
-    console.log("Tab created with ID:", openedTabId);
     sendResponse({ status: "Success", tabId: openedTabId });
   });
 }

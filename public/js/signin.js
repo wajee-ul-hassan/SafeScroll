@@ -33,8 +33,6 @@ async function signinFORM(event) {
         username: document.getElementById('username').value,
         password: document.getElementById('password').value,
     };
-    console.log(formObject.username)
-    
     if (!validateForm(formObject)) {
         return; // Stop submission if validation fails
     }
@@ -52,8 +50,7 @@ async function signinFORM(event) {
         if (!response.ok) throw new Error('Failed to submit form');
         window.location.href = '/subscribe'; 
     } catch (error) {
-    console.error('Error:', error);
-    alert('wrong credentials');
+        showDangerAlert('An Error Occurred');
 }
 
 }

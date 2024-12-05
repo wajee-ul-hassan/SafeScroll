@@ -7,26 +7,12 @@ const nodemailer = require('nodemailer');
 
 // Endpoint to render the email page
 router.get('/', isAuthorized, (req, res) => {
-    const email = req.query.email; // Extract the email from the query string
-    console.log(email);
-    if (email) {
-        res.render('emailpage', { userEmail: email });
-    }
-    else {
-        errorTitle = "Error 400";
-        errorMessage = "Trying to access page without authorization.";
-        statusCode=400;
-        res.status(statusCode).render('error', {
-            error_title: errorTitle,
-            status_code: statusCode,
-            error: errorMessage
-        });
-    }
+    email=decodeURIComponent(req.query.email);
+    res.render('emailpage',{userEmail:email});
 });
 
 router.post("/verify-otp", isAuthorized, async (req, res) => {
     const { otp } = req.body;
-
     try {
         const user = await User.findOne({ otp });
 
@@ -58,15 +44,20 @@ router.post("/verify-otp", isAuthorized, async (req, res) => {
         // Redirect to sign-in page
         res.redirect("/signin");
     } catch (error) {
-        console.error("OTP Verification Error:", error);
-        res.status(500).send("An error occurred during OTP verification.");
+        errorTitle = "Error 500";
+        errorMessage = "An error occurred while verifying the OTP."
+        statusCode = 500;
+        res.status(statusCode).render('error', {
+            error_title: errorTitle,
+            status_code: statusCode,
+            error: errorMessage
+        });
     }
 });
 
 router.post("/resend-otp", isAuthorized, async (req, res) => {
     try {
         const userEmail = req.body.email;
-        console.log(userEmail);
         const user = await User.findOne({ email: userEmail });
 
         if (!user) {
