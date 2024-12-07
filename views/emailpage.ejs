@@ -19,21 +19,36 @@
     </div>
     <div class="container verification-container">
         <div class="row justify-content-center">
-            <div class="col-md-6 text-center">
-                <h2 class="mb-4">Email Verification</h2>
+            <div class="col-md-10 text-center">
+                <h2 class="mb-4">Verify Code</h2>
                 <p class="verification-text">Enter the 4-digit OTP sent to your email address to verify your account.
                 </p>
                 <form id="otpForm">
                     <div class="mb-3">
                         <input type="hidden" name="token" id="otptoken" value="<%=temptoken%>">
-                        <input type="text" class="form-control text-center otp-input" name="otp" maxlength="4"
-                            id="otpInput" placeholder="Enter OTP" required>
+                        <div class="otp-container">
+                            <input type="text" class="otp-block" maxlength="1" id="otp1" placeholder="0"
+                                oninput="moveToNext(this, 'otp2')">
+                            <input type="text" class="otp-block" maxlength="1" id="otp2" placeholder="0"
+                                oninput="moveToNext(this, 'otp3')">
+                            <input type="text" class="otp-block" maxlength="1" id="otp3" placeholder="0"
+                                oninput="moveToNext(this, 'otp4')">
+                            <input type="text" class="otp-block" maxlength="1" id="otp4" oninput="moveToNext(this, '')"
+                                onblur="updateHiddenInput()" placeholder="0">
+                        </div>
+                        <input type="hidden" class="form-control text-center otp-input" name="otp" id="otpInput"
+                            placeholder="Enter OTP" required>
                     </div>
+
                     <button type="submit" class="btn btn-primary w-100">Verify</button>
                 </form>
-                <form id="resendOtpForm" class="mt-3">
+                <!-- <form id="resendOtpForm" class="mt-3">
                     <input type="hidden" name="email" id="emailInputResend" value="<%=userEmail%>">
                     <button type="submit" class="btn btn-secondary w-100">Resend OTP</button>
+                </form> -->
+                <form id="resendOtpForm" class="mt-3">
+                    <input type="hidden" name="email" id="emailInputResend" value="<%= userEmail %>">
+                    <a href="#" id="resendOtpLink" class="resend-code-link">Resend Code</a>
                 </form>
             </div>
         </div>

@@ -27,35 +27,34 @@
             <div class="col-md-12">
                 <h2 class="text-center mb-4">Sign Up</h2>
                 <form onsubmit="submitForm(event)" method="POST">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username">
+                    <div class="mb-4">
+                        <!-- <label for="username" class="form-label">
+                            Username
+                        </label> -->
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="username" placeholder="Username">
+                            <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email address</label>
-                        <input type="email" class="form-control" id="email" aria-describedby="emailHelp">
+                    <div class="mb-4">
+                        <!-- <label for="email" class="form-label">Email address</label> -->
+                        <div class="input-group">
+                            <input type="email" class="form-control" id="email" placeholder="Email">
+                            <span class="input-group-text"><i class="fa-solid fa-envelope"></i></i></span>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password">
+                    <div class="mb-4">
+                        <!-- <label for="password" class="form-label">Password</label> -->
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" placeholder="Password">
+                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></i></span>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 my-2">Sign Up</button>
+                    <button type="submit" class="btn btn-primary w-100 my-2">Create Account</button>
+                    <div class="already-account">
+                        <p>Already have an account? <a href="/signin" class="btn-link">Sign in here</a></p>
+                    </div>
                 </form>
-                <!-- <p class="social-text">Or Sign up with social platforms</p>
-            <div class="social-media">
-                <a href="#" class="social-icon">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="#" class="social-icon">
-                    <i class="fab fa-twitter"></i>
-                </a>
-                <a href="#" class="social-icon">
-                    <i class="fab fa-google"></i>
-                </a>
-                <a href="#" class="social-icon">
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
-            </div> -->
             </div>
         </div>
     </div>

@@ -46,3 +46,38 @@ body {
     width: 100%;
   }
 }
+
+
+.otp-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.otp-block {
+  width: 40px; /* Adjust width as needed */
+  height: 40px; /* Adjust height as needed */
+  text-align: center;
+  font-size: 1.5rem; /* Adjust font size as needed */
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  outline: none;
+}
+
+.otp-block:focus {
+  border-color: #007bff; /* Change color when focused */
+}
+.resend-code-link {
+  display: block;
+  text-align: center;
+  color: black;
+  text-decoration: none;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.resend-code-link:hover {
+  text-decoration: underline;
+}
+
+

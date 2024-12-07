@@ -14,48 +14,37 @@
     <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
-    <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="/css/signin.css">
 </head>
 
 <body>
-
     <div class="container form-container">
         <div class="row justify-content-center">
             <div class="col-md-12">
-                <h2 class="text-center mb-4">Welcome Back!</h2>
+                <h2 class="text-center mb-4">Login Account</h2>
                 <form onsubmit="signinFORM(event)" method="POST">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username">
+                    <div class="mb-4">
+                        <!-- <label for="username" class="form-label">Username</label> -->
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="username" placeholder="Username">
+                            <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password">
+                        <!-- <label for="password" class="form-label">Password</label> -->
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" placeholder="Password">
+                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></i></span>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 my-2">Sign In</button>
+                    <button type="submit" class="btn btn-primary w-100 my-2">Login</button>
+                    <div class="create-account">
+                        <p>Don't have an account? <a href="/signup" class="btn-link">Create a new account</a></p>
+                    </div>
                     <div class="forgot-password">
                         <a href="/forgetpassword">Forgot Password?</a>
                     </div>
-                    <p class="or-p">or</p>
-                    <div class="create-account">
-                        <a href="/signup">Create a new account</a>
-                    </div>
                 </form>
-                <!-- <p class="social-text">Or sign in with social platforms</p>
-            <div class="social-media">
-                <a href="#" class="social-icon">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="#" class="social-icon">
-                    <i class="fab fa-twitter"></i>
-                </a>
-                <a href="#" class="social-icon">
-                    <i class="fab fa-google"></i>
-                </a>
-                <a href="#" class="social-icon">
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
-            </div> -->
             </div>
         </div>
     </div>

@@ -20,9 +20,6 @@ document.getElementById("otpForm").addEventListener("submit", async (event) => {
             showDangerAlert(result.error_message || "Unexpected error occurred.");
             return;
         }
-
-        // Success case
-        showSuccessAlert("OTP Verified");
         window.location.href = '/signin';
     } catch (error) {
         console.error("Client-side error during OTP verification:", error);
@@ -30,7 +27,7 @@ document.getElementById("otpForm").addEventListener("submit", async (event) => {
     }
 });
 
-document.getElementById("resendOtpForm").addEventListener("submit", async (event) => {
+document.getElementById("resendOtpLink").addEventListener("click", async (event) => {
     event.preventDefault(); // Prevent default form submission
 
     const email = document.getElementById("emailInputResend").value;
@@ -51,7 +48,6 @@ document.getElementById("resendOtpForm").addEventListener("submit", async (event
             showDangerAlert(result.error_message || "Unexpected error occurred.");
             return;
         }
-        showSuccessAlert("Successfully sent the OTP.");
         window.location.href = `/email-page?email=${encodeURIComponent(result.email)}&temptoken=${encodeURIComponent(result.temptoken)}`;
     } catch (error) {
         showDangerAlert("An error occurred while resending the OTP. Please try again.");
@@ -59,6 +55,24 @@ document.getElementById("resendOtpForm").addEventListener("submit", async (event
         hideLoadingBar();
     }
 });
+
+function moveToNext(input, nextId) {
+    if (input.value.length === 1 && nextId) {
+        document.getElementById(nextId).focus();
+    }
+}
+
+function updateHiddenInput() {
+    const otp1 = document.getElementById('otp1').value;
+    const otp2 = document.getElementById('otp2').value;
+    const otp3 = document.getElementById('otp3').value;
+    const otp4 = document.getElementById('otp4').value;
+
+    // Combine the values and set it to the hidden input field
+    const otpValue = otp1 + otp2 + otp3 + otp4;
+    document.getElementById('otpInput').value = otpValue;
+}
+
 
 // Show loading bar
 function showLoadingBar() {

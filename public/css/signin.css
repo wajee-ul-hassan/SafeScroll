@@ -14,30 +14,11 @@ body {
   max-width: 500px;
   width: 100%;
 }
-.social-text {
-  text-align: center;
-  margin: 1.5rem 0;
+.input-group-text i {
+  font-size: 1.25rem;
+  margin-left: 5px;
 }
-.social-media {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-}
-.social-icon {
-  color: #fff;
-  background-color: #007bff;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-decoration: none;
-  transition: background-color 0.3s;
-}
-.social-icon:hover {
-  background-color: #0056b3;
-}
+
 .forgot-password {
   text-align: right;
   margin-top: 1rem;
@@ -46,7 +27,23 @@ body {
   color: #007bff;
   text-decoration: none;
   transition: color 0.3s;
+  font-weight: 600;
 }
 .forgot-password a:hover {
+  color: #0056b3;
+}
+.create-account {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.btn-link {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: 600;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
   color: #0056b3;
 }
