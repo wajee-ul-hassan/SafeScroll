@@ -1,13 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "Hateful Meme Blocker",
+  "name": "Safescroll",
   "version": "1.0",
   "description": "Blurs hateful memes by detecting and filtering flagged images in the DOM.",
   "permissions": ["storage", "activeTab", "scripting", "tabs"],
   "host_permissions": ["<all_urls>"],
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "logo192.png"
+    "default_icon": "safescroll.png"
   },
   "content_scripts": [
     {
@@ -26,6 +26,6 @@
     }
   ],
   "icons": {
-    "192": "logo192.png"
+    "192": "safescroll.png"
   }
 }

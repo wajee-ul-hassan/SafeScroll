@@ -22,33 +22,50 @@ router.get("/", authenticateToken, (req, res) => {
 // Stripe Checkout
 router.post("/create-checkout-session", authenticateToken, async (req, res) => {
   try {
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "subscription",
-      line_items: [
-        {
-          price: "price_1QP5eXP0df5kgPeln24TSiuh", // Replace with your Stripe price ID
-          quantity: 1,
-        },
-      ],
-      success_url: "http://localhost:3000/subscribe/success",
-      cancel_url: "http://localhost:3000/subscribe",
-    });
-    res.redirect(303, session.url);
+    const tempuser = req.user;
+    let isSubscribed = false;
+    if (tempuser !== null) {
+      const username = req.user.username;
+      const user = await User.findOne({ username: username });
+
+      const { subscription } = user;
+      if (subscription && subscription.startDate && subscription.endDate) {
+        const currentDate = Date.now();
+        const startDate = new Date(subscription.startDate).getTime();
+        const endDate = new Date(subscription.endDate).getTime();
+
+        isSubscribed = currentDate >= startDate && currentDate <= endDate;
+      }
+      if (!isSubscribed) {
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ["card"],
+          mode: "subscription",
+          line_items: [
+            {
+              price: "price_1QP5eXP0df5kgPeln24TSiuh", // Replace with your Stripe price ID
+              quantity: 1,
+            },
+          ],
+          success_url: `http://localhost:3000/subscribe/success?username=${username}`,
+          cancel_url: "http://localhost:3000/subscribe",
+        });
+
+        // Send the session URL as JSON response
+        res.status(200).json({ url: session.url });
+      }
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
   } catch (error) {
-    errorTitle = "Error 500";
-    errorMessage = "Internal Server Error."
-    statusCode = 500;
-    res.status(statusCode).render('error', {
-      error_title: errorTitle,
-      status_code: statusCode,
-      error: errorMessage
-    });
+    console.error('Error during checkout session creation:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
 router.get("/success", async (req, res) => {
   try {
+    const username = req.query.username;
+    console.log(username);
     const user = await User.findOne({ username: username });
     if (!user) {
       errorTitle = "Error 404";
@@ -60,7 +77,6 @@ router.get("/success", async (req, res) => {
         error: errorMessage
       });
     }
-
     // Set subscription start and end dates
     const startDate = new Date();
     const endDate = new Date(startDate);
@@ -73,7 +89,7 @@ router.get("/success", async (req, res) => {
 
     await user.save();
 
-    res.redirect("/dashboard"); // Redirect to dashboard after subscription
+    res.redirect("http://localhost:3000/dashboard");
   } catch (error) {
     errorTitle = "Error 500";
     errorMessage = "An error occurred while updating subscription"

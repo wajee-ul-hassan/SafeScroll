@@ -38,30 +38,30 @@ router.post("/", async (req, res) => {
         const tempUserData = { username, email, password: hashedPassword, otp, otpExpiry };
         const tempToken = jwt.sign(tempUserData, 'Nevergiveup', { expiresIn: '70s' });
         // Send verification email
-        // const transporter = nodemailer.createTransport({
-        //     service: 'Gmail',
-        //     auth: {
-        //         user: 'f219298@cfd.nu.edu.pk',
-        //         pass: 'lucky031671660371#'
-        //     },
-        //     tls: { rejectUnauthorized: false }
-        // });
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: 'f219298@cfd.nu.edu.pk',
+                pass: 'lucky031671660371#'
+            },
+            tls: { rejectUnauthorized: false }
+        });
 
-        // const mailOptions = {
-        //     from: 'f219298@cfd.nu.edu.pk',
-        //     to: email,
-        //     subject: 'Your OTP for Email Verification',
-        //     html: `
-        //     <p>Your OTP for email verification is: <strong>${otp}</strong>.</p>
-        //     <p>The OTP is valid for 1 minute.</p>
-        // `,
-        // };
+        const mailOptions = {
+            from: 'f219298@cfd.nu.edu.pk',
+            to: email,
+            subject: 'Your OTP for Email Verification',
+            html: `
+            <p>Your OTP for email verification is: <strong>${otp}</strong>.</p>
+            <p>The OTP is valid for 1 minute.</p>
+        `,
+        };
 
-        // try {
-        //     await transporter.sendMail(mailOptions);
-        // } catch (error) {
-        //     console.error("Error while sending email:", error);
-        // }  
+        try {
+            await transporter.sendMail(mailOptions);
+        } catch (error) {
+            console.error("Error while sending email:", error);
+        }  
         // Render the email page after sending the OTP email
         res.status(200).json({
             message: 'Please check your email for verification.',

@@ -27,10 +27,9 @@ if (!fs.existsSync(buildDir)) {
 
 // Copy individual files
 copyFile(path.join(__dirname, "public", "manifest.json"), path.join(buildDir, "manifest.json"));
-copyFile(path.join(__dirname, "public", "logo192.png"), path.join(buildDir, "logo192.png"));
+copyFile(path.join(__dirname, "public", "safescroll.png"), path.join(buildDir, "safescroll.png"));
 copyFile(path.join(__dirname, "public", "background.js"), path.join(buildDir, "background.js"));
 copyFile(path.join(__dirname, "public", "content.js"), path.join(buildDir, "content.js"));
-copyFile(path.join(__dirname, "views", "index.ejs"), path.join(buildDir, "index.ejs"));
 copyFile(path.join(__dirname, "public", "popup.html"), path.join(buildDir, "popup.html"));
 copyFile(path.join(__dirname, "public", "popup.css"), path.join(buildDir, "popup.css"));
 copyFile(path.join(__dirname, "public", "popup.js"), path.join(buildDir, "popup.js"));

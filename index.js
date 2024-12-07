@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const stripe = require("stripe")("sk_test_51QP5HeP0df5kgPelNQGK7TSyvBmOBu5fQAwUmWTHVsMbg7h4xtmPgLL6fCcsyGYRrjektNxbB5dGqKmxe4xmIBOr00kDdGTjs0");
 // Import your route modules
 const signinRouter = require('./routes/signin');
+const popupRouter = require('./routes/popup');
 const signupRouter = require('./routes/signup');
 const emailRouter = require('./routes/email');
 const forgetpasswordRouter = require('./routes/forgetpassword'); // Destructure to get the router
@@ -37,7 +38,8 @@ app.use('/email-page', emailRouter);
 app.use('/forgetpassword',forgetpasswordRouter);
 app.use('/subscribe', subscriptionRouter);
 app.use('/dashboard',dashboardRouter);
-app.use('/error',errorRouter)
+app.use('/error',errorRouter);
+app.use('/popup',popupRouter);
 
 
 app.get("/", (req, res) => {

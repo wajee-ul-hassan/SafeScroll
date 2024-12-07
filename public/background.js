@@ -1,17 +1,47 @@
 let openedTabId = null; // Store the tab ID
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  const subscribeUrl = "http://localhost:3000/subscribe";
+  const subscribeUrl = "http://localhost:3000/subscribe/create-checkout-session";
   const signinUrl = "http://localhost:3000/signin";
+  const dashboardUrl = "http://localhost:3000/dashboard";
+  const data = {};
 
   if (message.action === 'openSubsPage') {
-    openTab(subscribeUrl, sendResponse);
+    sendPostRequest(subscribeUrl, message.data, sendResponse);
   } else if (message.action === 'opensigninPage') {
     openTab(signinUrl, sendResponse);
+  } else if (message.action === 'openDashboard') {
+    openTab(dashboardUrl, sendResponse);
   }
   return true;
 });
+// Function to send a POST request and handle the JSON response
+async function sendPostRequest(url, data, sendResponse) {
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
 
+    if (!response.ok) {
+      throw new Error(`Failed to fetch from ${url}. Status: ${response.status}`);
+    }
+
+    const responseData = await response.json(); // Parse JSON response
+    if (responseData.url) {
+      // Redirect to the URL received from the server
+      openTab(responseData.url,sendResponse);
+    } else {
+      console.error('Unexpected response data:', responseData);
+    }
+  } catch (err) {
+    console.error('Error during POST request:', err);
+    sendResponse({ status: 'Error', message: err.message });
+  }
+}
 // Function to handle tab creation and reuse
 function openTab(url, sendResponse) {
   if (openedTabId) {
@@ -47,15 +77,6 @@ chrome.tabs.onRemoved.addListener((tabId) => {
   }
 });
 
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-//   if (message.action === "processImages" && message.data) {
-//     console.log("Received image URLs from content script:", message.data);
-//     // Send image URLs to your model for analysis (API call logic here)
-//     // Example: 
-//     // fetch("http://your-model-endpoint.com/analyze", {
-//     //   method: "POST",
-//     //   headers: { "Content-Type": "application/json" },
-//     //   body: JSON.stringify({ images: message.data })
-//     // });
-//   }
-// });
+chrome.runtime.onInstalled.addListener(() => {
+  console.log('Extension installed!');
+});

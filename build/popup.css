@@ -1,17 +1,22 @@
 body {
-    width: 300px;
-    height: 410px;
-    background-color: #ececec;
+    width: 400px;
+    height: 400px;
+    background-color: #ffffff;
     padding: 0;
     margin: 0;
+}
+.check-form{
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 input[type="checkbox"]
 {
     height: 200px;
     width: 200px;
     appearance: none;
-    box-shadow: -10px -10px 15px rgba(255,255,255,0.5),
-                 10px -10px 15px rgba(70,70,70,0.12);
+    box-shadow: -10px -10px 15px rgba(255, 255, 255, 0.617),
+                 8px -8px 10px rgba(70, 70, 70, 0.028);
     border-radius: 50%;
     outline: none;
     display: flex;
@@ -23,16 +28,43 @@ input[type="checkbox"]:after
 {
     content: url(./power-switch-red.png);
 }
-input[type="checkbox"]:checked
+/* input[type="checkbox"]:checked
 {
     box-shadow: -10px -10px 15px rgba(255,255,255,0.5),
                 10px 10px 15px rgba(70,70,70,0.12),
                 inset -10px -10px 15px rgba(255,255,255,0.5),
                 inset 10px 10px 15px rgba(70,70,70,0.12);
-}
+} */
 input[type="checkbox"]:checked::after
 {
     content: url(./power-switch-green.png);
+}
+#navbar {
+    display: flex;
+    justify-content: space-between;
+    /* padding: 10px 20px; */
+}
+#navbar .logo img {
+    height: 40px; /* Adjust the height of the logo */
+    width: auto; /* Maintain aspect ratio */
+    object-fit: contain; /* Ensure proper image fit */
+}
+#navbar #signin,#dashboard {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    border-radius: 4px;
+    background-color: #007bff; /* Bootstrap primary color */
+    border: none;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+
+#navbar #signin:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+#navbar .logo{
+    color: rgb(0, 156, 0);
+    font-weight: 700;
 }
 
 

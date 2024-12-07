@@ -34,10 +34,10 @@ router.post("/", async (req, res) => {
         }
 
         // Generate a JWT
-        const token = jwt.sign({ username: user.username, email: user.email }, 'Nevergiveup', { expiresIn: '1h' });
+        const token = jwt.sign({ username: user.username, email: user.email }, 'Nevergiveup', { expiresIn: '10m' });
 
         // Send the JWT in an HTTP-only cookie
-        res.cookie('authToken', token, { httpOnly: true, secure: true}); // 1 hour
+        res.cookie('authToken', token, { httpOnly: true, secure: true});
         res.status(200).send('Sign-in successful');
 
     } catch (error) {

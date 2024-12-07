@@ -52,7 +52,7 @@ async function signinFORM(event) {
             showDangerAlert(`${errorData.error_message}`);
             return;
         }
-        window.location.href = '/subscribe';
+        showSuccessAlert('Signin Successful.Click extension.');
     } catch (error) {
         showDangerAlert('An Error Occurred while Signing in');
     }
