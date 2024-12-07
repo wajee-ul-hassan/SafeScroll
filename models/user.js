@@ -30,14 +30,6 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false // To track whether the email is verified
     },
-    otp: {
-        type: String, // Store the OTP temporarily
-        default: null
-    },
-    otpExpiry: {
-        type: Date, // To track when the OTP expires
-        default: null
-    }
 });
 
 // Create and export User model

@@ -34,6 +34,7 @@ function validateForm(formObject) {
 
 async function submitForm(event) {
     event.preventDefault();
+    showLoadingBar(); // Show loading bar
     const formObject = {
         username: document.getElementById('username').value,
         password: document.getElementById('password').value,
@@ -43,7 +44,6 @@ async function submitForm(event) {
     if (!validateForm(formObject)) {
         return; // Stop submission if validation fails
     }
-
     try {
         const response = await fetch('/signup', {
             method: 'POST',
@@ -54,23 +54,29 @@ async function submitForm(event) {
         });
 
         if (!response.ok) {
-            if (response.status === 400) {
-                const errorData = await response.json(); // Parse the JSON response
-                showDangerAlert(`${errorData.message}`);
-                return;
-            }
-            throw new Error('Failed to submit form');
+            const errorData = await response.json(); // Parse the JSON response
+            showDangerAlert(`${errorData.error_message}`);
+            return;
         }
-
-        // Parse the JSON response if status is 200
         const data = await response.json();
-
         // Redirect to the email page and pass the email in the URL
-        window.location.href = `/email-page?email=${encodeURIComponent(data.email)}`;
+        window.location.href = `/email-page?email=${encodeURIComponent(data.email)}&temptoken=${encodeURIComponent(data.temptoken)}`;
     } catch (error) {
         showDangerAlert('An error occurred while signing up');
+    } finally {
+        hideLoadingBar();
     }
 
+}
+
+// Show loading bar
+function showLoadingBar() {
+    document.getElementById('loading-bar-container').style.display = 'block';
+}
+
+// Hide loading bar
+function hideLoadingBar() {
+    document.getElementById('loading-bar-container').style.display = 'none';
 }
 
 function showDangerAlert(message) {

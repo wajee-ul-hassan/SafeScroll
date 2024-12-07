@@ -13,13 +13,8 @@ router.post("/", async (req, res) => {
         const user = await User.findOne({ username });
 
         if (!user) {
-            errorTitle = "Error 401";
-            errorMessage = "Invalid Username and Password."
-            statusCode = 401;
-            return res.status(statusCode).render('error', {
-                error_title: errorTitle,
-                status_code: statusCode,
-                error: errorMessage
+            return res.status(401).json({
+                error_message: "Invalid Username or Password."
             });
         }
 
@@ -27,13 +22,14 @@ router.post("/", async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            errorTitle = "Error 401";
-            errorMessage = "Invalid Username and Password."
-            statusCode = 401;
-            return res.status(statusCode).render('error', {
-                error_title: errorTitle,
-                status_code: statusCode,
-                error: errorMessage
+            return res.status(401).json({
+                error_message: "Invalid Username or Password."
+            });
+        }
+        const isVerified = user.isVerified;
+        if (!isVerified) {
+            return res.status(401).json({
+                error_message: "User not Verified."
             });
         }
 
@@ -41,7 +37,7 @@ router.post("/", async (req, res) => {
         const token = jwt.sign({ username: user.username, email: user.email }, 'Nevergiveup', { expiresIn: '1h' });
 
         // Send the JWT in an HTTP-only cookie
-        res.cookie('authToken', token, { httpOnly: true, secure: true, maxAge: 3600000 }); // 1 hour
+        res.cookie('authToken', token, { httpOnly: true, secure: true}); // 1 hour
         res.status(200).send('Sign-in successful');
 
     } catch (error) {

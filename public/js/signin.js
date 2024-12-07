@@ -14,7 +14,7 @@ function validateForm(formObject) {
         return false;
     }
 
-   
+
     // Check password strength
     const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
     if (!passwordPattern.test(formObject.password)) {
@@ -24,7 +24,7 @@ function validateForm(formObject) {
 
     return true;
 }
- 
+
 
 async function signinFORM(event) {
     event.preventDefault();
@@ -47,11 +47,15 @@ async function signinFORM(event) {
             credentials: 'include'
         });
 
-        if (!response.ok) throw new Error('Failed to submit form');
-        window.location.href = '/subscribe'; 
+        if (!response.ok) {
+            const errorData = await response.json(); // Parse the JSON response
+            showDangerAlert(`${errorData.error_message}`);
+            return;
+        }
+        window.location.href = '/subscribe';
     } catch (error) {
-        showDangerAlert('An Error Occurred');
-}
+        showDangerAlert('An Error Occurred while Signing in');
+    }
 
 }
 

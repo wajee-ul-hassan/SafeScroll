@@ -21,6 +21,19 @@ function validateForm(formObject) {
         return false;
     }
 
+    // Check password strength
+    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
+    if (!passwordPattern.test(formObject.password)) {
+        showDangerAlert('Password must be at least 5 characters long, contain at least one letter and one number');
+        return false;
+    }
+    console.log(formObject.password);
+    console.log(formObject.confirmpassword);
+    // Check if passwords match
+    if (formObject.password != formObject.confirmpassword) {
+        showDangerAlert('Passwords do not match');
+        return false;
+    }
     return true;
 }
 
@@ -29,51 +42,51 @@ function validateForm(formObject) {
 
 async function forgetpassword(event) {
     event.preventDefault();
-        
-        const username = document.getElementById('username').value;
-        const email = document.getElementById('email').value;
 
-        const data = { username, email };
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const confirmpassword = document.getElementById('confirmpassword').value;
 
-        if (!validateForm(data)) {
-            return; // Stop submission if validation fails
-        }
+    const data = { username, email, password, confirmpassword };
 
-
-        try {
-            const response = await fetch('/forgetpassword', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-
-            if (response.ok) {
-                const message = await response.text();
-                showSuccessAlert("Password reset successful. Please check your email for the new password.");
-                window.location.href = "/signin";
-            } else {
-                const error = await response.text();
-                showDangerAlert(`${error}`);
-            }
-        } catch (error) {
-            showDangerAlert('An Error Occurred');
-        }
+    if (!validateForm(data)) {
+        return;
     }
- 
-    function showDangerAlert(message) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: message,
+
+    try {
+        const response = await fetch('/forgetpassword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
         });
+
+        if (!response.ok) {
+            const errorData = await response.json(); // Parse the JSON response
+            showDangerAlert(`${errorData.error_message}`);
+            return;
+        }
+        showSuccessAlert("Password reset successful.");
+        window.location.href = "/signin";
+    } catch (error) {
+        showDangerAlert('An Error Occurred while resetting.');
     }
-    
-    function showSuccessAlert(message) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: message,
-        });
-    }
+}
+
+function showDangerAlert(message) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: message,
+    });
+}
+
+function showSuccessAlert(message) {
+    Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: message,
+    });
+}
