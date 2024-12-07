@@ -28,13 +28,13 @@
                         <input type="hidden" name="token" id="otptoken" value="<%=temptoken%>">
                         <div class="otp-container">
                             <input type="text" class="otp-block" maxlength="1" id="otp1" placeholder="0"
-                                oninput="moveToNext(this, 'otp2')">
+                                autocomplete="off" oninput="moveToNext(this, 'otp2')">
                             <input type="text" class="otp-block" maxlength="1" id="otp2" placeholder="0"
-                                oninput="moveToNext(this, 'otp3')">
+                                autocomplete="off" oninput="moveToNext(this, 'otp3')">
                             <input type="text" class="otp-block" maxlength="1" id="otp3" placeholder="0"
-                                oninput="moveToNext(this, 'otp4')">
+                                autocomplete="off" oninput="moveToNext(this, 'otp4')">
                             <input type="text" class="otp-block" maxlength="1" id="otp4" oninput="moveToNext(this, '')"
-                                onblur="updateHiddenInput()" placeholder="0">
+                                autocomplete="off" onblur="updateHiddenInput()" placeholder="0">
                         </div>
                         <input type="hidden" class="form-control text-center otp-input" name="otp" id="otpInput"
                             placeholder="Enter OTP" required>

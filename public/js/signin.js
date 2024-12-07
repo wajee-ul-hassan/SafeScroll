@@ -50,9 +50,14 @@ async function signinFORM(event) {
         if (!response.ok) {
             const errorData = await response.json(); // Parse the JSON response
             showDangerAlert(`${errorData.error_message}`);
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
             return;
         }
         showSuccessAlert('Signin Successful.Click extension.');
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        
     } catch (error) {
         showDangerAlert('An Error Occurred while Signing in');
     }

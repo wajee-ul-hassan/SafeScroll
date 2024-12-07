@@ -46,18 +46,60 @@ router.post("/create-checkout-session", authenticateToken, async (req, res) => {
               quantity: 1,
             },
           ],
-          success_url: `http://localhost:3000/subscribe/success?username=${username}`,
+          success_url: `http://localhost:3000/subscribe/verify-payment?username=${username}&sessionID={CHECKOUT_SESSION_ID}`,
           cancel_url: "http://localhost:3000/subscribe",
         });
-
         // Send the session URL as JSON response
         res.status(200).json({ url: session.url });
       }
+      else{
+        alert('User already subscribed');
+        res.redirect("http://localhost:3000/dashboard");
+      }
     } else {
-      res.status(404).json({ error: 'User not found' });
+      errorTitle = "Error 404";
+      errorMessage = "User not Found"
+      statusCode = 404;
+      res.status(statusCode).render('error', {
+        error_title: errorTitle,
+        status_code: statusCode,
+        error: errorMessage
+      });
     }
   } catch (error) {
-    console.error('Error during checkout session creation:', error);
+    errorTitle = "Error 500";
+    errorMessage = "An error occurred while subscription"
+    statusCode = 500;
+    res.status(statusCode).render('error', {
+      error_title: errorTitle,
+      status_code: statusCode,
+      error: errorMessage
+    });
+  }
+});
+// Render the subscription page
+router.get("/verify-payment", authenticateToken, async (req, res) => {
+  try {
+    const username = req.query.username;
+    const sessionID = req.query.sessionID;
+
+    if (!username || !sessionID) {
+      return res.status(400).json({ error: 'Missing username or session ID' });
+    }
+
+    // Retrieve the session details from Stripe
+    const session = await stripe.checkout.sessions.retrieve(sessionID);
+
+    if (session.payment_status === 'paid') {
+      // Payment was successful, redirect to the success page
+      res.redirect(`http://localhost:3000/subscribe/success?username=${username}`);
+    } else {
+      // Payment was not successful, display an error or redirect to an error page
+      console.error('Payment was not successful:', session.payment_status);
+      res.status(400).json({ error: 'Payment was not successful' });
+    }
+  } catch (error) {
+    console.error('Error verifying payment:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -65,7 +107,6 @@ router.post("/create-checkout-session", authenticateToken, async (req, res) => {
 router.get("/success", async (req, res) => {
   try {
     const username = req.query.username;
-    console.log(username);
     const user = await User.findOne({ username: username });
     if (!user) {
       errorTitle = "Error 404";
