@@ -65,7 +65,6 @@ router.post("/", authenticateToken, async (req, res) => {
     }
 });
 
-
 router.get('/', authenticateToken, (req, res) => {
     const user = req.user;
 
@@ -81,5 +80,4 @@ router.get('/', authenticateToken, (req, res) => {
     }
     res.render('signin');
 });
-
 module.exports = router;

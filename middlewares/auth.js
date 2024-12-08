@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const authenticateToken = (req, res, next) => {
   const token = req.cookies.authToken;
   if (!token) {
-    req.user = null; // Set user to null if no token is found
+    req.user = null;
     return next();
   }
 

@@ -5,6 +5,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const signinUrl = "http://localhost:3000/signin";
   const dashboardUrl = "http://localhost:3000/dashboard";
   const logoutUrl = "http://localhost:3000/logout";
+  const manageUrl = "http://localhost:3000/manageprofile";
   const data = {};
 
   if (message.action === 'openSubsPage') {
@@ -15,6 +16,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     openTab(dashboardUrl, sendResponse);
   } else if (message.action === 'logout') {
     openTab(logoutUrl, sendResponse);
+  } else if (message.action === 'manage') {
+    openTab(manageUrl, sendResponse);
   }
   return true;
 });

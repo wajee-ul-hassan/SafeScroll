@@ -5,7 +5,6 @@ body {
   padding: 0;
   margin: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  border: 2px solid;
 }
 #navbar {
   display: flex;
@@ -18,7 +17,6 @@ body {
   font-size: 1.2rem;
   color: #007bff;
 }
-
 #navbar .logo-img {
   height: 40px;
   width: auto;
@@ -27,7 +25,7 @@ body {
 
 #navbar .brand-name {
   font-weight: bold;
-  color: #007bff;
+  color: #000;
 }
 #navbar #signin {
   font-size: 0.9rem;

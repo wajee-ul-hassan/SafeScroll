@@ -14,6 +14,7 @@ const subscriptionRouter = require('./routes/subscription');
 const dashboardRouter = require('./routes/dashboard');
 const errorRouter = require('./routes/error');
 const logoutRouter = require('./routes/logout');
+const manageprofileRouter=require('./routes/manageprofile');
 
 const app = express();
 
@@ -42,7 +43,7 @@ app.use('/dashboard', dashboardRouter);
 app.use('/error', errorRouter);
 app.use('/popup', popupRouter);
 app.use('/logout', logoutRouter);
-
+app.use('/manageprofile',manageprofileRouter);
 
 app.get("/", (req, res) => {
   res.render("signin");

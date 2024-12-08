@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const attachNavbarEventListeners = () => {
         const signin = document.getElementById('signin');
         const logout = document.getElementById('logout');
+        const manageprofile = document.getElementById('manage');
 
         if (signin) {
             signin.addEventListener('click', () => {
@@ -26,10 +27,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (logout) {
             logout.addEventListener('click', function () {
-                const userConfirmed = confirm("Are you sure you want to logout?");
-                if (userConfirmed) {
-                    chrome.runtime.sendMessage({ action: 'logout' }, (response) => { });
-                }
+                chrome.runtime.sendMessage({ action: 'logout' }, (response) => { });
+
+            });
+        }
+        if (manageprofile) {
+            manageprofile.addEventListener('click', function () {
+                chrome.runtime.sendMessage({ action: 'manage' }, (response) => { });
             });
         }
     };
@@ -72,6 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             </svg>
                         </span>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                            <li><a class="dropdown-item" id="manage">Manage Profile</a></li>
                             <li><a class="dropdown-item" id="logout">Logout</a></li>
                         </ul>
                     </div>
@@ -93,11 +98,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (dashboard) {
             dashboard.style.display = isSubscribed ? 'block' : 'none';
-            dashboard.style.marginLeft='90px';
+            dashboard.style.marginLeft = '90px';
         }
         if (buySubscriptionButton) {
             buySubscriptionButton.style.display = isSubscribed ? 'none' : 'block';
-            buySubscriptionButton.style.marginLeft='90px';
+            buySubscriptionButton.style.marginLeft = '90px';
         }
     } catch (err) {
         console.error('Error:', err);
