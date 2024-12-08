@@ -55,7 +55,7 @@ body {
 .btn-link {
   text-decoration: none;
   color: #007bff;
-  font-weight: bold;
+  font-weight: 400;
 }
 
 .btn-link:hover {

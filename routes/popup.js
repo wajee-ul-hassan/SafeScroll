@@ -11,7 +11,7 @@ router.get('/', authenticateToken, async (req, res) => {
         let user = null;
         let isLoggedIn = false;
         let isSubscribed = false;
-
+        
         if (tempuser) {
             isLoggedIn = true;
             user = await User.findOne({ username: tempuser.username });

@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= error_title %></title>
+    <title>
+        <%= error_title %>
+    </title>
     <style>
         body {
             margin: 0;
@@ -11,7 +14,6 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            /* background: linear-gradient(135deg, #ff6f61, #f06292); */
             font-family: 'Poppins', sans-serif;
             color: #fff;
         }
@@ -26,25 +28,31 @@
         }
 
         h1 {
-            font-size: 8em;
+            font-size: 4em;
             font-weight: bold;
             margin: 0;
             text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            color: rgba(255, 0, 0, 0.756);
+            color: rgba(0, 0, 0, 0.888);
         }
 
         p {
             font-size: 1.8em;
             margin: 10px 0 20px;
             text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            color: rgba(255, 0, 0, 0.756);
+            color: rgba(0, 0, 0, 0.888);
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <h1><%= status_code %></h1>
-        <p><%= error %></p>
+        <h1>
+            <%= status_code %>
+        </h1>
+        <p>
+            <%= error %>
+        </p>
     </div>
 </body>
+
 </html>

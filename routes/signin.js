@@ -5,15 +5,19 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/user'); // Adjust the path as necessary
 const authenticateToken = require('../middlewares/auth');
-
 router.post("/", authenticateToken, async (req, res) => {
     try {
         const { username, password } = req.body;
-        const user = req.user;  // This comes from the authenticateToken middleware
+        const user = req.user;
 
         if (user !== null) {
-            return res.status(401).json({
-                error_message: "Already Signed in."
+            const errorTitle = "Error 404";
+            const errorMessage = "Page not Found.";
+            const statusCode = 404;
+            return res.status(statusCode).render('error', {
+                error_title: errorTitle,
+                status_code: statusCode,
+                error: errorMessage
             });
         }
 
@@ -21,7 +25,7 @@ router.post("/", authenticateToken, async (req, res) => {
 
         if (!foundUser) {
             return res.status(401).json({
-                error_message: "Invalid Username or Password."
+                error_message: "Invalid Credentials"
             });
         }
 
@@ -30,7 +34,7 @@ router.post("/", authenticateToken, async (req, res) => {
 
         if (!isPasswordValid) {
             return res.status(401).json({
-                error_message: "Invalid Username or Password."
+                error_message: "Invalid Credentials."
             });
         }
 
@@ -42,7 +46,7 @@ router.post("/", authenticateToken, async (req, res) => {
         }
 
         // Generate a JWT using a secure key from environment variables
-        const token = jwt.sign({ username: foundUser.username, email: foundUser.email },'Nevergiveup', { expiresIn: '10m' });
+        const token = jwt.sign({ username: foundUser.username, email: foundUser.email }, 'Nevergiveup', { expiresIn: '10m' });
 
         // Send the JWT in an HTTP-only cookie
         res.cookie('authToken', token, { httpOnly: true, secure: true });
@@ -62,7 +66,19 @@ router.post("/", authenticateToken, async (req, res) => {
 });
 
 
-router.get('/', (req, res) => {
+router.get('/', authenticateToken, (req, res) => {
+    const user = req.user;
+
+    if (user !== null) {
+        const errorTitle = "Error 404";
+        const errorMessage = "Page not Found.";
+        const statusCode = 404;
+        return res.status(statusCode).render('error', {
+            error_title: errorTitle,
+            status_code: statusCode,
+            error: errorMessage
+        });
+    }
     res.render('signin');
 });
 

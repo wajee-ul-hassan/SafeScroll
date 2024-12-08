@@ -10,18 +10,17 @@ function validateForm(formObject) {
     // Check username length and character requirements
     const usernamePattern = /^[A-Za-z]{4,}$/;
     if (!usernamePattern.test(formObject.username)) {
-        showDangerAlert('invalid username');
+        showDangerAlert('Invalid Credentials');
         return false;
     }
 
 
     // Check password strength
-    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
+    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/;
     if (!passwordPattern.test(formObject.password)) {
-        showDangerAlert('invalid password');
+        showDangerAlert('Invalid Credentials');
         return false;
     }
-
     return true;
 }
 
@@ -50,14 +49,9 @@ async function signinFORM(event) {
         if (!response.ok) {
             const errorData = await response.json(); // Parse the JSON response
             showDangerAlert(`${errorData.error_message}`);
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
             return;
         }
-        showSuccessAlert('Signin Successful.Click extension.');
-        document.getElementById('username').value = '';
-        document.getElementById('password').value = '';
-        
+        window.location.href = '/subscribe';
     } catch (error) {
         showDangerAlert('An Error Occurred while Signing in');
     }

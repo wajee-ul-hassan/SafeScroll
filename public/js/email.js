@@ -3,14 +3,16 @@ document.getElementById("otpForm").addEventListener("submit", async (event) => {
 
     const otp = document.getElementById("otpInput").value;
     const temptoken = document.getElementById("otptoken").value;
-
+    const username = document.getElementById("username").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
     try {
         const response = await fetch("/email-page/verify-otp", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ otp, temptoken }),
+            body: JSON.stringify({ otp, temptoken, username, email, password }),
         });
 
         const result = await response.json();
@@ -30,8 +32,10 @@ document.getElementById("otpForm").addEventListener("submit", async (event) => {
 document.getElementById("resendOtpLink").addEventListener("click", async (event) => {
     event.preventDefault(); // Prevent default form submission
 
-    const email = document.getElementById("emailInputResend").value;
-    const temptoken = document.getElementById("otptoken").value;
+    const username = document.getElementById("username").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
     showLoadingBar();
     try {
         const response = await fetch("/email-page/resend-otp", {
@@ -39,7 +43,7 @@ document.getElementById("resendOtpLink").addEventListener("click", async (event)
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email, temptoken }),
+            body: JSON.stringify({ email, username, password }),
         });
 
         const result = await response.json();
@@ -48,7 +52,7 @@ document.getElementById("resendOtpLink").addEventListener("click", async (event)
             showDangerAlert(result.error_message || "Unexpected error occurred.");
             return;
         }
-        window.location.href = `/email-page?email=${encodeURIComponent(result.email)}&temptoken=${encodeURIComponent(result.temptoken)}`;
+        window.location.href = `/email-page?username=${encodeURIComponent(result.username)}&email=${encodeURIComponent(result.email)}&password=${encodeURIComponent(result.password)}&temptoken=${encodeURIComponent(result.temptoken)}`;
     } catch (error) {
         showDangerAlert("An error occurred while resending the OTP. Please try again.");
     } finally {
@@ -72,7 +76,46 @@ function updateHiddenInput() {
     const otpValue = otp1 + otp2 + otp3 + otp4;
     document.getElementById('otpInput').value = otpValue;
 }
+document.addEventListener("DOMContentLoaded", function () {
+    const timerElement = document.getElementById("timer");
+    let timeLeft = 60; // Time in seconds
 
+    const timerInterval = setInterval(() => {
+        // Calculate minutes and seconds
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+
+        // Format the time (e.g., 0:09)
+        timerElement.textContent = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+
+        timeLeft--;
+
+        // Stop the timer when it reaches 0
+        if (timeLeft < 0) {
+            clearInterval(timerInterval);
+            timerElement.textContent = "0:00";
+        }
+    }, 1000);
+
+    const otpInputs = document.querySelectorAll('.otp-input');
+
+// Attach event listeners to each input field
+otpInputs.forEach((input, index) => {
+    input.addEventListener('input', (event) => {
+        // Move to the next input if the current one is full
+        if (input.value.length >= 1 && index < otpInputs.length - 1) {
+            otpInputs[index + 1].focus();
+        }
+    });
+
+    input.addEventListener('keydown', (event) => {
+        // Move to the previous input if Backspace is pressed and the current input is empty
+        if (event.key === 'Backspace' && input.value === '' && index > 0) {
+            otpInputs[index - 1].focus();
+        }
+    });
+});
+});
 
 // Show loading bar
 function showLoadingBar() {

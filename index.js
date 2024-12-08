@@ -11,8 +11,9 @@ const signupRouter = require('./routes/signup');
 const emailRouter = require('./routes/email');
 const forgetpasswordRouter = require('./routes/forgetpassword'); // Destructure to get the router
 const subscriptionRouter = require('./routes/subscription');
-const dashboardRouter=require('./routes/dashboard');
+const dashboardRouter = require('./routes/dashboard');
 const errorRouter = require('./routes/error');
+const logoutRouter = require('./routes/logout');
 
 const app = express();
 
@@ -35,17 +36,25 @@ app.use(cookieParser());
 app.use('/signin', signinRouter);
 app.use('/signup', signupRouter);
 app.use('/email-page', emailRouter);
-app.use('/forgetpassword',forgetpasswordRouter);
+app.use('/forgetpassword', forgetpasswordRouter);
 app.use('/subscribe', subscriptionRouter);
-app.use('/dashboard',dashboardRouter);
-app.use('/error',errorRouter);
-app.use('/popup',popupRouter);
+app.use('/dashboard', dashboardRouter);
+app.use('/error', errorRouter);
+app.use('/popup', popupRouter);
+app.use('/logout', logoutRouter);
 
 
 app.get("/", (req, res) => {
-  res.render("index");
+  res.render("signin");
 });
 
+app.use((req, res, next) => {
+  res.status(404).render('error', {
+    error_title: "Error 404",
+    status_code: 404,
+    error: "The page you are looking for does not exist.",
+  });
+});
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

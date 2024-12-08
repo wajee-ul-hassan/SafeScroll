@@ -22,13 +22,11 @@ function validateForm(formObject) {
     }
 
     // Check password strength
-    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
+    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/;
     if (!passwordPattern.test(formObject.password)) {
-        showDangerAlert('Password must be at least 5 characters long, contain at least one letter and one number');
+        showDangerAlert('Password must be at least 8 characters long, include at least one letter, one number, and one special character.');
         return false;
     }
-    console.log(formObject.password);
-    console.log(formObject.confirmpassword);
     // Check if passwords match
     if (formObject.password != formObject.confirmpassword) {
         showDangerAlert('Passwords do not match');
@@ -55,6 +53,7 @@ async function forgetpassword(event) {
     }
 
     try {
+        showLoadingBar();
         const response = await fetch('/forgetpassword', {
             method: 'POST',
             headers: {
@@ -62,19 +61,26 @@ async function forgetpassword(event) {
             },
             body: JSON.stringify(data),
         });
-
+        const result = await response.json();
         if (!response.ok) {
-            const errorData = await response.json(); // Parse the JSON response
-            showDangerAlert(`${errorData.error_message}`);
+            showDangerAlert(`${result.error_message}`);
             return;
         }
-        showSuccessAlert("Password reset successful.");
-        window.location.href = "/signin";
+        window.location.href = `/email-page?username=${encodeURIComponent(result.username)}&email=${encodeURIComponent(result.email)}&password=${encodeURIComponent(result.password)}&temptoken=${encodeURIComponent(result.temptoken)}`;
     } catch (error) {
         showDangerAlert('An Error Occurred while resetting.');
+    } finally {
+        hideLoadingBar();
     }
 }
+function showLoadingBar() {
+    document.getElementById('loading-bar-container').style.display = 'block';
+}
 
+// Hide loading bar
+function hideLoadingBar() {
+    document.getElementById('loading-bar-container').style.display = 'none';
+}
 function showDangerAlert(message) {
     Swal.fire({
         icon: 'error',

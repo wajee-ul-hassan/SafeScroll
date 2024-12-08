@@ -27,7 +27,7 @@ body {
   color: #007bff;
   text-decoration: none;
   transition: color 0.3s;
-  font-weight: 600;
+  font-weight: 400;
 }
 .forgot-password a:hover {
   color: #0056b3;
@@ -40,7 +40,7 @@ body {
 .btn-link {
   text-decoration: none;
   color: #007bff;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .btn-link:hover {
