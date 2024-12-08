@@ -1,51 +1,33 @@
 body {
   width: 350px;
-  height: 410px;
-  background-color: #ffffff;
+  height: auto;
+  background-color: #f8f9fa;
   padding: 0;
   margin: 0;
-  border: "none";
-}
-.check-form {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-input[type="checkbox"] {
-  height: 200px;
-  width: 200px;
-  appearance: none;
-  box-shadow: -10px -10px 15px rgba(255, 255, 255, 0.617),
-    8px -8px 10px rgba(70, 70, 70, 0.028);
-  border-radius: 50%;
-  outline: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-input[type="checkbox"]:after {
-  content: url(./icons/power-switch-red.png);
-}
-/* input[type="checkbox"]:checked
-{
-    box-shadow: -10px -10px 15px rgba(255,255,255,0.5),
-                10px 10px 15px rgba(70,70,70,0.12),
-                inset -10px -10px 15px rgba(255,255,255,0.5),
-                inset 10px 10px 15px rgba(70,70,70,0.12);
-} */
-input[type="checkbox"]:checked::after {
-  content: url(./icons/power-switch-green.png);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  border: none;
 }
 #navbar {
   display: flex;
   justify-content: space-between;
-  /* padding: 10px 20px; */
+  align-items: center;
 }
-#navbar .logo img {
-  height: 40px; /* Adjust the height of the logo */
-  width: auto; /* Maintain aspect ratio */
-  object-fit: contain; /* Ensure proper image fit */
+#navbar .logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  color: #007bff;
+}
+
+#navbar .logo-img {
+  height: 40px;
+  width: auto;
+  margin-right: 10px;
+}
+
+#navbar .brand-name {
+  font-weight: bold;
+  color: #007bff;
 }
 #navbar #signin {
   font-size: 0.9rem;
@@ -59,10 +41,6 @@ input[type="checkbox"]:checked::after {
 
 #navbar #signin:hover {
   background-color: #0056b3; /* Darker shade on hover */
-}
-#navbar .logo {
-  color: rgb(0, 156, 0);
-  font-weight: 700;
 }
 .dropdown {
   position: relative;
@@ -95,12 +73,53 @@ input[type="checkbox"]:checked::after {
 .dropdown-item:hover {
   background-color: #f8f9fa;
 }
-
 .dropdown-toggle:hover + .dropdown-menu,
 .dropdown:hover .dropdown-menu {
   display: block;
 }
-#dashboard img{
-  width: 40px;
-  height: 40px;
+.check-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+input[type="checkbox"] {
+  height: 200px;
+  width: 200px;
+  appearance: none;
+  box-shadow: -15px -15px 25px rgba(255, 255, 255, 0.617),
+    8px -8px 10px rgba(70, 70, 70, 0.028);
+  border-radius: 50%;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+input[type="checkbox"]:after {
+  content: url(./icons/power-switch-red.png);
+}
+input[type="checkbox"]:checked {
+  box-shadow: -10px -10px 15px rgba(255, 255, 255, 0.5),
+    10px 10px 15px rgba(70, 70, 70, 0.12),
+    inset -10px -10px 15px rgba(255, 255, 255, 0.5),
+    inset 10px 10px 15px rgba(70, 70, 70, 0.12);
+}
+input[type="checkbox"]:checked::after {
+  content: url(./icons/power-switch-green.png);
+}
+.subscribe_div{
+  text-align: center;
+}
+.note {
+  background-color: #ffffff;
+  border-left: 5px solid #007bff;
+  padding: 10px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  margin-top: 15px;
+}
+
+.note p {
+  margin: 0;
+  color: #333;
 }

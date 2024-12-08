@@ -11,22 +11,29 @@
 </head>
 
 <body>
-    <div class="container my-1">
-        <div id="navbar">
-            <span class="logo"><img src="./safescroll.png" alt="logo.jpg">Safescroll</span>
+    <div class="container p-3">
+        <header id="navbar" class="d-flex justify-content-between align-items-center mb-4">
+            <span class="logo d-flex align-items-center">
+                <img src="./safescroll.png" alt="logo" class="logo-img">
+                <span class="brand-name">SafeScroll</span>
+            </span>
             <div>
-                <button class="btn" id="signin">Signin</button>
-                <button class="btn" id="dashboard">Dashboard</button>
+                <button class="btn btn-outline-primary me-2" id="signin">Sign In</button>
             </div>
-        </div>
+        </header>
+
         <div class="form-check form-switch mt-4 check-form">
             <input class="" type="checkbox" id="enableExtensionSwitch">
         </div>
-        <div class="mt-4 text-center mb-3">
+
+        <div class="mt-4 mb-3 subscribe_div">
+            <button class="btn btn-success" id="dashboard">Access Dashboard</button>
             <button class="btn btn-primary" id="buySubscription">Buy Subscription</button>
         </div>
-        <div class="note">
-            <p><b>Note:</b> Buy Subscription to get access to dashboard and view memes blocked by model.</p>
+
+        <div class="note bg-light p-3 rounded">
+            <p class="mb-0"><b>Note:</b> Subscribe to unlock full access to the dashboard and view exclusive content, including memes filtered by the model.
+            </p>
         </div>
     </div>
     <script src="popup.js"></script>

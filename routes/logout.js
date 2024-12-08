@@ -9,7 +9,7 @@ router.get('/', authenticateToken, (req, res) => {
         return res.status(404).render('error', {
             error_title: "Error 404",
             status_code: 404,
-            error: "User not found."
+            error: "Page not found."
         });
     }
     res.cookie('authToken', '', { httpOnly: true, secure: true, expires: new Date(0) });

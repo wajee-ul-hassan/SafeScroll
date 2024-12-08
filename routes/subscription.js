@@ -30,14 +30,7 @@ router.get("/", authenticateToken, async (req, res) => {
       res.redirect('/dashboard');
     }
   } else {
-    const errorTitle = "Error 404";
-    const errorMessage = "Page not Found.";
-    const statusCode = 404;
-    return res.status(statusCode).render('error', {
-      error_title: errorTitle,
-      status_code: statusCode,
-      error: errorMessage
-    });
+    res.redirect('/signin');
   }
 });
 
