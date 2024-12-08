@@ -7,7 +7,7 @@ const User = require('../models/user'); // Adjust the path as necessary
 const authenticateToken = require('../middlewares/auth');
 router.post("/", authenticateToken, async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { email, password } = req.body;
         const user = req.user;
 
         if (user !== null) {
@@ -21,7 +21,7 @@ router.post("/", authenticateToken, async (req, res) => {
             });
         }
 
-        const foundUser = await User.findOne({ username });
+        const foundUser = await User.findOne({ email });
 
         if (!foundUser) {
             return res.status(401).json({

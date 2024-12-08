@@ -5,7 +5,7 @@ body {
   padding: 0;
   margin: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  border: none;
+  border: 2px solid;
 }
 #navbar {
   display: flex;
@@ -86,7 +86,7 @@ input[type="checkbox"] {
   height: 200px;
   width: 200px;
   appearance: none;
-  box-shadow: -15px -15px 25px rgba(255, 255, 255, 0.617),
+  box-shadow: -15px -15px 25px rgba(237, 234, 234, 0.664),
     8px -8px 10px rgba(70, 70, 70, 0.028);
   border-radius: 50%;
   outline: none;

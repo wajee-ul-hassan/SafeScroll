@@ -7,14 +7,11 @@ function validateForm(formObject) {
         }
     }
 
-    // Check username length and character requirements
-    const usernamePattern = /^[A-Za-z]{4,}$/;
-    if (!usernamePattern.test(formObject.username)) {
-        showDangerAlert('Invalid Credentials');
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(formObject.email)) {
+        showDangerAlert('Invalid email format');
         return false;
     }
-
-
     // Check password strength
     const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/;
     if (!passwordPattern.test(formObject.password)) {
@@ -29,11 +26,11 @@ async function signinFORM(event) {
     event.preventDefault();
 
     const formObject = {
-        username: document.getElementById('username').value,
+        email: document.getElementById('email').value,
         password: document.getElementById('password').value,
     };
     if (!validateForm(formObject)) {
-        return; // Stop submission if validation fails
+        return;
     }
 
     try {

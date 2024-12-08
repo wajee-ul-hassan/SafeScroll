@@ -20,7 +20,6 @@ function validateForm(formObject) {
         showDangerAlert('Invalid email format');
         return false;
     }
-
     // Check password strength
     const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/;
     if (!passwordPattern.test(formObject.password)) {

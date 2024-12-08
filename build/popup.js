@@ -93,11 +93,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (dashboard) {
             dashboard.style.display = isSubscribed ? 'block' : 'none';
-            dashboard.style.marginLeft='80px';
+            dashboard.style.marginLeft='90px';
         }
         if (buySubscriptionButton) {
             buySubscriptionButton.style.display = isSubscribed ? 'none' : 'block';
-            buySubscriptionButton.style.marginLeft='80px';
+            buySubscriptionButton.style.marginLeft='90px';
         }
     } catch (err) {
         console.error('Error:', err);
