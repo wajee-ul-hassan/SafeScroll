@@ -15,7 +15,7 @@ const dashboardRouter = require('./routes/dashboard');
 const errorRouter = require('./routes/error');
 const logoutRouter = require('./routes/logout');
 const manageprofileRouter=require('./routes/manageprofile');
-
+const cors = require('cors');
 const app = express();
 
 // Connect to MongoDB
@@ -27,7 +27,6 @@ app.set("views", path.join(__dirname, "views"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-// Middleware to parse JSON and form data
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -56,6 +55,13 @@ app.use((req, res, next) => {
     error: "The page you are looking for does not exist.",
   });
 });
+
+app.use(cors({
+  origin: 'chrome-extension://kdfbjhgfobhcnlgilleefogemmmjkhkk',
+  credentials: true,
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

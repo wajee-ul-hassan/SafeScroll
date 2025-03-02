@@ -116,6 +116,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 });
+document.addEventListener("DOMContentLoaded", () => {
+    const checkbox = document.getElementById("enableExtensionSwitch");
+  
+    // Restore the saved checkbox state when the popup loads
+    chrome.storage.local.get("checkboxState", (result) => {
+      checkbox.checked = result.checkboxState || false;
+    });
+  
+    checkbox.addEventListener("change", () => {
+      // Save the new checkbox state
+      chrome.storage.local.set({ checkboxState: checkbox.checked }, () => {
+        console.log("Checkbox state saved:", checkbox.checked);
+      });
+  
+      if (checkbox.checked) {
+        // If enabled, notify background to begin meme collection
+        chrome.runtime.sendMessage({ action: "startImageCollection" });
+      } else {
+        console.log("Images collection disabled.");
+      }
+    });
+  });
+  
+  
+
+
 
 
 

@@ -19,9 +19,100 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message.action === 'manage') {
     openTab(manageUrl, sendResponse);
   }
+  else if (message.action === "startImageCollection") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tab = tabs[0];
+      if (!tab) {
+        console.error("No active tab.");
+        return;
+      }
+
+      // Check if URL is supported
+      const isSupported = tab.url && (tab.url.includes('facebook.com') || tab.url.includes('instagram.com') || tab.url.includes('pinterest.com'));
+      if (!isSupported) {
+        console.log("Unsupported tab.");
+        return;
+      }
+
+      const sendWithRetry = (retries = 3) => {
+        chrome.tabs.sendMessage(tab.id, { action: "getImages" }, (response) => {
+          if (chrome.runtime.lastError) {
+            if (retries > 0) {
+              setTimeout(() => sendWithRetry(retries - 1), 500);
+            } else {
+              console.error("Failed after retries:", chrome.runtime.lastError.message);
+            }
+          } else {
+            console.log("Initial images:", response?.imageUrls);
+          }
+          if (response?.imageUrls) {
+            sendToServer(response.imageUrls);
+          }
+        });
+      };
+
+      sendWithRetry();
+    });
+  } else if (message.action === "newImages") {
+    // Log newly detected image URLs.
+    console.log("New image URLs detected:", message.imageUrls);
+    if (message.imageUrls) {
+      sendToServer(message.imageUrls);
+    }
+  }
   return true;
 });
 
+async function sendToServer(imageUrls) {
+  try {
+    const response = await fetch('http://localhost:3000/dashboard/store-image', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include', // This sends cookies with the request
+      body: JSON.stringify({ imageUrls })
+    });
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    
+    console.log('Images successfully sent to server');
+  } catch (error) {
+    console.error('Error sending to server:', error);
+  }
+}
+
+// Message handler remains the same
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.action === "startImageCollection") {
+    // ... existing tab checking code ...
+    
+    chrome.tabs.sendMessage(tab.id, { action: "getImages" }, (response) => {
+      if (response?.imageUrls) {
+        sendToServer(response.imageUrls);
+      }
+    });
+  } else if (message.action === "newImages") {
+    if (message.imageUrls) {
+      sendToServer(message.imageUrls);
+    }
+  }
+});
+
+async function getAuthToken() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['authToken'], (result) => {
+      resolve(result.authToken);
+    });
+  });
+}
+
+// Add listener to receive token from content script
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.action === "setAuthToken") {
+    chrome.storage.local.set({ authToken: message.token });
+  }
+});
 // Function to handle tab creation and reuse
 function openTab(url, sendResponse) {
   if (url.endsWith("/logout")) {

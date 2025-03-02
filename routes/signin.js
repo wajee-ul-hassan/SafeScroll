@@ -49,7 +49,12 @@ router.post("/", authenticateToken, async (req, res) => {
         const token = jwt.sign({ username: foundUser.username, email: foundUser.email }, 'Nevergiveup', { expiresIn: '10m' });
 
         // Send the JWT in an HTTP-only cookie
-        res.cookie('authToken', token, { httpOnly: true, secure: true });
+        res.cookie('authToken', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 600000 // 10 minutes
+        });
         res.status(200).send('Sign-in successful');
 
     } catch (error) {

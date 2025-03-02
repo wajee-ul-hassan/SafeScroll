@@ -4,8 +4,8 @@ const cookieParser = require('cookie-parser');
 const User = require('../models/user');
 
 const router = express.Router();
+const imageStore = new Map();
 
-// Render the dashboard
 router.get("/", authenticateToken, async (req, res) => {
     try {
         const tempuser = req.user;
@@ -43,8 +43,13 @@ router.get("/", authenticateToken, async (req, res) => {
                 error: "User not Subscribed."
             });
         }
+        const userId = user._id.toString();
+        const userImages = imageStore[userId] || [];
 
-        res.render("dashboard");
+        res.render("dashboard", { 
+            images: userImages,
+            isSubscribed // Pass subscription status if needed
+        });
     } catch (error) {
         console.error("Error in GET /:", error);
         res.status(500).render('error', {
@@ -55,5 +60,22 @@ router.get("/", authenticateToken, async (req, res) => {
     }
 });
 
+router.post("/store-image", authenticateToken, async (req, res) => {
+  try {
+    const { imageUrls } = req.body;
+    const userId = req.user.username; // Using username as unique identifier
 
+    if (!imageStore.has(userId)) {
+      imageStore.set(userId, new Set());
+    }
+
+    const existing = imageStore.get(userId);
+    imageUrls.forEach(url => existing.add(url));
+    
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Error storing image:", error);
+    res.status(500).json({ success: false });
+  }
+});
 module.exports = router;

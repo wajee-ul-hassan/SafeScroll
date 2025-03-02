@@ -4,6 +4,6 @@ mongoose.connect("mongodb://localhost:27017/safescroll")
 .then(()=>{
 })
 .catch(()=>{
-    console.log("error appear")
+    console.log("Unable to connect to Database")
 })
 

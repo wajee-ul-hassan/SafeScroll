@@ -8,52 +8,75 @@
     Dasboard
   </title>
   <style>
-    body {
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      /* background: linear-gradient(135deg, #ff6f61, #f06292); */
-      font-family: 'Poppins', sans-serif;
-      color: #fff;
+    .image-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+      overflow: hidden;
     }
 
-    .container {
-      text-align: center;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(10px);
+    .image-table th,
+    .image-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      color: #333;
     }
 
-    h1 {
-      font-size: 4em;
+    .image-table th {
+      background-color: #f06292;
+      color: white;
+    }
+
+    .url-cell {
+      max-width: 400px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .status-cell {
+      text-transform: uppercase;
       font-weight: bold;
-      margin: 0;
-      text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      color: rgba(0, 0, 0, 0.888);
-    }
-
-    p {
-      font-size: 1.8em;
-      margin: 10px 0 20px;
-      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      color: rgba(0, 0, 0, 0.888);
+      /* color: <%=Math.random() > 0.5 ? '#e74c3c': '#2ecc71' %>; */
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h1>
-      Dashboard
-    </h1>
-    <p>
-      Coming Soon!
-    </p>
+    <h1>Dashboard</h1>
+
+    <% if (images.length> 0) { %>
+      <table class="image-table">
+        <thead>
+          <tr>
+            <th>Image URL</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% images.forEach((url)=> { %>
+            <tr>
+              <td class="url-cell">
+                <a href="<%= url %>" target="_blank">
+                  <%= url %>
+                </a>
+              </td>
+              <td class="status-cell">
+                <%= Math.random()> 0.5 ? 'Hateful' : 'Safe' %>
+              </td>
+            </tr>
+            <% }) %>
+        </tbody>
+      </table>
+      <% } else { %>
+        <p>No images detected yet!</p>
+        <% } %>
   </div>
 </body>
+
 
 </html>
