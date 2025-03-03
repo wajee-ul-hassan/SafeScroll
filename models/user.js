@@ -30,6 +30,16 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false // To track whether the email is verified
     },
+    images: [{
+        url: {
+            type: String,
+            required: true
+        },
+        addedAt: {
+            type: Date,
+            default: Date.now
+        }
+    }]
 });
 
 // Create and export User model

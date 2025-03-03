@@ -20,7 +20,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     openTab(manageUrl, sendResponse);
   }
   else if (message.action === "startImageCollection") {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
       const tab = tabs[0];
       if (!tab) {
         console.error("No active tab.");
@@ -34,19 +34,28 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return;
       }
 
+      // First ensure content script is injected
+      try {
+        await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ['content.js']
+        });
+      } catch (error) {
+        console.error("Script injection failed:", error);
+        return;
+      }
+
       const sendWithRetry = (retries = 3) => {
         chrome.tabs.sendMessage(tab.id, { action: "getImages" }, (response) => {
           if (chrome.runtime.lastError) {
             if (retries > 0) {
-              setTimeout(() => sendWithRetry(retries - 1), 500);
+              setTimeout(() => sendWithRetry(retries - 1), 1000); // Increased delay
             } else {
               console.error("Failed after retries:", chrome.runtime.lastError.message);
             }
-          } else {
-            console.log("Initial images:", response?.imageUrls);
-          }
-          if (response?.imageUrls) {
-            sendToServer(response.imageUrls);
+          } else if (response?.imageUrls) {
+            console.log("Initial images:", response.imageUrls);
+            // sendToServer(response.imageUrls);
           }
         });
       };
@@ -57,7 +66,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Log newly detected image URLs.
     console.log("New image URLs detected:", message.imageUrls);
     if (message.imageUrls) {
-      sendToServer(message.imageUrls);
+      // sendToServer(message.imageUrls);
     }
   }
   return true;

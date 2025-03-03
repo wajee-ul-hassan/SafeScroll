@@ -4,7 +4,6 @@ const cookieParser = require('cookie-parser');
 const User = require('../models/user');
 
 const router = express.Router();
-const imageStore = new Map();
 
 router.get("/", authenticateToken, async (req, res) => {
     try {
@@ -43,12 +42,10 @@ router.get("/", authenticateToken, async (req, res) => {
                 error: "User not Subscribed."
             });
         }
-        const userId = user._id.toString();
-        const userImages = imageStore[userId] || [];
 
         res.render("dashboard", { 
-            images: userImages,
-            isSubscribed // Pass subscription status if needed
+            images: user.images || [],
+            isSubscribed
         });
     } catch (error) {
         console.error("Error in GET /:", error);
@@ -61,21 +58,57 @@ router.get("/", authenticateToken, async (req, res) => {
 });
 
 router.post("/store-image", authenticateToken, async (req, res) => {
-  try {
-    const { imageUrls } = req.body;
-    const userId = req.user.username; // Using username as unique identifier
+    try {
+        const { imageUrls } = req.body;
+        const username = req.user.username;
+        const user = await User.findOne({ username: username });
 
-    if (!imageStore.has(userId)) {
-      imageStore.set(userId, new Set());
+        if (!user) {
+            return res.status(404).json({ 
+                success: false, 
+                error: "User not found" 
+            });
+        }
+
+        let isSubscribed = false;
+        const { subscription } = user;
+
+        if (subscription?.startDate && subscription?.endDate) {
+            const currentDate = Date.now();
+            const startDate = new Date(subscription.startDate).getTime();
+            const endDate = new Date(subscription.endDate).getTime();
+            isSubscribed = currentDate >= startDate && currentDate <= endDate;
+        }
+
+        if (!isSubscribed) {
+            return res.status(403).json({ 
+                success: false, 
+                error: "User not subscribed" 
+            });
+        }
+
+        // Add new images to the user's images array
+        const newImages = imageUrls.map(url => ({
+            url,
+            addedAt: new Date()
+        }));
+
+        // Update user's images array with new images
+        user.images = [...new Set([...user.images, ...newImages])];
+        await user.save();
+        
+        res.status(200).json({ 
+            success: true,
+            message: "Images stored successfully",
+            totalImages: user.images.length
+        });
+    } catch (error) {
+        console.error("Error storing image:", error);
+        res.status(500).json({ 
+            success: false, 
+            error: "Internal server error" 
+        });
     }
-
-    const existing = imageStore.get(userId);
-    imageUrls.forEach(url => existing.add(url));
-    
-    res.status(200).json({ success: true });
-  } catch (error) {
-    console.error("Error storing image:", error);
-    res.status(500).json({ success: false });
-  }
 });
+
 module.exports = router;
