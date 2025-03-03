@@ -71,7 +71,7 @@ async function sendToServer(imageUrls) {
         'Content-Type': 'application/json'
       },
       credentials: 'include', // This sends cookies with the request
-      body: JSON.stringify({ imageUrls })
+      body: JSON.stringify({ imageUrls,username })
     });
 
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -82,23 +82,6 @@ async function sendToServer(imageUrls) {
   }
 }
 
-// Message handler remains the same
-chrome.runtime.onMessage.addListener((message) => {
-  if (message.action === "startImageCollection") {
-    // ... existing tab checking code ...
-    
-    chrome.tabs.sendMessage(tab.id, { action: "getImages" }, (response) => {
-      if (response?.imageUrls) {
-        sendToServer(response.imageUrls);
-      }
-    });
-  } else if (message.action === "newImages") {
-    if (message.imageUrls) {
-      sendToServer(message.imageUrls);
-    }
-  }
-});
-
 async function getAuthToken() {
   return new Promise((resolve) => {
     chrome.storage.local.get(['authToken'], (result) => {
@@ -107,7 +90,6 @@ async function getAuthToken() {
   });
 }
 
-// Add listener to receive token from content script
 chrome.runtime.onMessage.addListener((message) => {
   if (message.action === "setAuthToken") {
     chrome.storage.local.set({ authToken: message.token });
