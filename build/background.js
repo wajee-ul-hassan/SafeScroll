@@ -1,4 +1,61 @@
 let openedTabId = null; // Store the tab ID
+let isSubscribed = false;
+let username = "";
+let isLoggedIn = false;
+let isServerCommunicationEnabled = false;
+let currentUsername = null;
+
+// Function to store images in chrome storage with timestamp
+async function storeImagesLocally(imageUrls, username) {
+  try {
+    // Get existing stored images
+    const result = await chrome.storage.local.get('storedImages');
+    const storedImages = result.storedImages || [];
+
+    // Add new images with timestamp
+    const newImages = imageUrls.map(url => ({
+      url,
+      username,
+      timestamp: Date.now()
+    }));
+
+    // Combine with existing images
+    const updatedImages = [...storedImages, ...newImages];
+
+    // Store updated images
+    await chrome.storage.local.set({ storedImages: updatedImages });
+
+    console.log('Images stored locally:', newImages.length);
+  } catch (error) {
+    console.error('Error storing images locally:', error);
+  }
+}
+
+// Function to clean up expired images (older than 24 hours)
+async function cleanupExpiredImages() {
+  try {
+    const result = await chrome.storage.local.get('storedImages');
+    const storedImages = result.storedImages || [];
+
+    const now = Date.now();
+    const oneDayInMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+    // Filter out images older than 24 hours
+    const validImages = storedImages.filter(img =>
+      (now - img.timestamp) < oneDayInMs
+    );
+
+    // Update storage with only valid images
+    await chrome.storage.local.set({ storedImages: validImages });
+
+    console.log('Cleaned up expired images. Remaining:', validImages.length);
+  } catch (error) {
+    console.error('Error cleaning up expired images:', error);
+  }
+}
+
+// Set up periodic cleanup (every hour)
+setInterval(cleanupExpiredImages, 60 * 60 * 1000);
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const subscribeUrl = "http://localhost:3000/subscribe";
@@ -18,14 +75,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     openTab(logoutUrl, sendResponse);
   } else if (message.action === 'manage') {
     openTab(manageUrl, sendResponse);
-  }
-  else if (message.action === "startImageCollection") {
+  } else if (message.action === "startImageCollection") {
+    isSubscribed = message.isSubscribed;
+    username = message.username;
+    isLoggedIn = true;
+    console.log("Image collection started for user:", username, "Subscribed:", isSubscribed);
+
     chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
       const tab = tabs[0];
       if (!tab) {
         console.error("No active tab.");
         return;
       }
+
+      // Store the tab ID
+      openedTabId = tab.id;
 
       // Check if URL is supported
       const isSupported = tab.url && (tab.url.includes('facebook.com') || tab.url.includes('instagram.com') || tab.url.includes('pinterest.com'));
@@ -46,64 +110,66 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       const sendWithRetry = (retries = 3) => {
-        chrome.tabs.sendMessage(tab.id, { action: "getImages" }, (response) => {
+        chrome.tabs.sendMessage(tab.id, { action: "startImageGrabbing", isSubscribed: isSubscribed, username: username }, (response) => {
           if (chrome.runtime.lastError) {
             if (retries > 0) {
-              setTimeout(() => sendWithRetry(retries - 1), 1000); // Increased delay
+              setTimeout(() => sendWithRetry(retries - 1), 1000);
             } else {
               console.error("Failed after retries:", chrome.runtime.lastError.message);
             }
-          } else if (response?.imageUrls) {
-            console.log("Initial images:", response.imageUrls);
-            // sendToServer(response.imageUrls);
+          } else if (response) {
+            console.log(response);
           }
         });
       };
-
       sendWithRetry();
     });
   } else if (message.action === "newImages") {
-    // Log newly detected image URLs.
     console.log("New image URLs detected:", message.imageUrls);
-    if (message.imageUrls) {
-      // sendToServer(message.imageUrls);
+    if (message.imageUrls && isSubscribed) {
+      // Store images locally regardless of subscription
+      storeImagesLocally(message.imageUrls, message.username);
+      // sendToServer(message.imageUrls, message.username);
+    }
+  } else if (message.action === "stopImageCollection") {
+    // Send stop message to content script using stored tab ID
+    if (openedTabId) {
+      console.log("Stopping image collection in tab:", openedTabId);
+      chrome.tabs.sendMessage(openedTabId, { action: "stopImageCollection" });
+    } else {
+      console.log("No tab ID stored for stopping image collection.");
     }
   }
   return true;
 });
 
-async function sendToServer(imageUrls) {
+async function sendToServer(imageUrls, username) {
+  if (!isSubscribed || !username) {
+    console.log("User not subscribed or no username provided");
+    return;
+  }
+
   try {
     const response = await fetch('http://localhost:3000/dashboard/store-image', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials: 'include', // This sends cookies with the request
-      body: JSON.stringify({ imageUrls})
+      credentials: 'include',
+      body: JSON.stringify({
+        imageUrls,
+        username: username
+      })
     });
 
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    
+
     console.log('Images successfully sent to server');
   } catch (error) {
     console.error('Error sending to server:', error);
   }
 }
 
-async function getAuthToken() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(['authToken'], (result) => {
-      resolve(result.authToken);
-    });
-  });
-}
-
-chrome.runtime.onMessage.addListener((message) => {
-  if (message.action === "setAuthToken") {
-    chrome.storage.local.set({ authToken: message.token });
-  }
-});
 // Function to handle tab creation and reuse
 function openTab(url, sendResponse) {
   if (url.endsWith("/logout")) {
@@ -175,8 +241,4 @@ chrome.tabs.onRemoved.addListener((tabId) => {
   if (tabId === openedTabId) {
     openedTabId = null;
   }
-});
-
-chrome.runtime.onInstalled.addListener(() => {
-  console.log('Extension installed!');
 });

@@ -50,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const data = await response.json(); // Expect JSON data from the endpoint
         const { isLoggedIn, isSubscribed, username } = data;
-
         // Update the navbar
         if (navbar) {
             let navbarHTML = `
@@ -124,20 +123,40 @@ document.addEventListener("DOMContentLoaded", () => {
       checkbox.checked = result.checkboxState || false;
     });
   
-    checkbox.addEventListener("change", () => {
+    checkbox.addEventListener("change", async () => {
       // Save the new checkbox state
       chrome.storage.local.set({ checkboxState: checkbox.checked }, () => {
         console.log("Checkbox state saved:", checkbox.checked);
       });
   
       if (checkbox.checked) {
-        // If enabled, notify background to begin meme collection
-        chrome.runtime.sendMessage({ action: "startImageCollection" });
+        try {
+          // Get the current subscription and username state
+          const response = await fetch('http://localhost:3000/popup');
+          if (!response.ok) {
+            throw new Error('Failed to fetch popup content.');
+          }
+          const data = await response.json();
+          const { isSubscribed, username } = data;
+          
+          // Send startImageCollection message with subscription status
+          chrome.runtime.sendMessage({ 
+            action: "startImageCollection",
+            isSubscribed,
+            username
+          });
+        } catch (error) {
+          console.error('Error fetching subscription status:', error);
+        }
       } else {
-        console.log("Images collection disabled.");
+        // Stop image collection when unchecked
+        chrome.runtime.sendMessage({ 
+          action: "stopImageCollection"
+        });
+        console.log("Image collection disabled.");
       }
     });
-  });
+});
   
   
 

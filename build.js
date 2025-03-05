@@ -39,7 +39,6 @@ copyFile(path.join(__dirname, "public", "content.js"), path.join(buildDir, "cont
 copyFile(path.join(__dirname, "public", "popup.html"), path.join(buildDir, "popup.html"));
 copyFile(path.join(__dirname, "public", "popup.css"), path.join(buildDir, "popup.css"));
 copyFile(path.join(__dirname, "public", "popup.js"), path.join(buildDir, "popup.js"));
-
 // Copy all icon files to the new icons folder
 const iconSourceDir = path.join(__dirname, "public", "assets", "icons");
 if (fs.existsSync(iconSourceDir)) {

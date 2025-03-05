@@ -3,7 +3,7 @@
   "name": "Safescroll",
   "version": "1.0",
   "description": "Blurs hateful memes by detecting and filtering flagged images in the DOM.",
-  "permissions": ["storage", "activeTab", "scripting", "tabs","cookies"],
+  "permissions": ["storage", "activeTab", "scripting", "tabs", "cookies"],
   "host_permissions": ["<all_urls>"],
   "action": {
     "default_popup": "popup.html",
@@ -13,7 +13,7 @@
     {
       "matches": ["*://*.facebook.com/*", "*://*.instagram.com/*","*://*.pinterest.com/*"],
       "js": ["content.js"],
-      "run_at": "document_end"
+      "run_at": "document_start"
     }
   ],
   "background": {

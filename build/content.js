@@ -1,12 +1,12 @@
+(function() {
 // Add this at the beginning of content.js
 console.log('Content script loaded');
 
-// Constants for batch processing
-const MAX_BATCH_SIZE = 50; // Maximum number of images to send at once
-const BATCH_TIMEOUT = 3000; // 3 seconds timeout
-
 // Track processed images
 const processedImages = new Set();
+let isSubscribed = false;
+let username = '';
+let observer = null; // Store observer reference
 
 // Debounce function to limit how often we send messages
 function debounce(func, wait) {
@@ -21,12 +21,6 @@ function debounce(func, wait) {
     };
 }
 
-// Helper function to extract image URLs from the page
-function extractImageUrls() {
-    const images = Array.from(document.querySelectorAll("img"));
-    return images.map(img => img.src).filter(src => src && src.trim() !== "");
-}
-
 // Add blur effect to images
 function applyBlurEffect(imgElement) {
     imgElement.style.filter = 'blur(10px)';
@@ -39,12 +33,29 @@ function applyBlurEffect(imgElement) {
 function processImageElement(img) {
     if (!processedImages.has(img.src)) {
         // Mock detection - replace with actual model later
-        const isHateful = Math.random() > 0.5; // Random flagging for testing
+        const isHateful = Math.random()>0.5; // Random flagging for testing
         if (isHateful) {
             applyBlurEffect(img);
         }
         processedImages.add(img.src);
+        return img.src;
     }
+    return null;
+}
+
+// Function to process and collect image URLs
+function processAndCollectImages() {
+    const images = Array.from(document.querySelectorAll("img"));
+    const newUrls = [];
+    
+    images.forEach(img => {
+        const url = processImageElement(img);
+        if (url) {
+            newUrls.push(url);
+        }
+    });
+    
+    return newUrls;
 }
 
 // Batch of images to be sent
@@ -53,12 +64,12 @@ let imageBatch = new Set();
 // Function to send batched images
 const sendBatchedImages = debounce(() => {
     if (imageBatch.size > 0) {
-        // Convert Set to Array and limit the batch size
-        const imagesToSend = Array.from(imageBatch).slice(0, MAX_BATCH_SIZE);
-        
+        const imagesToSend = Array.from(imageBatch);
+        console.log("Sending images:", imagesToSend);
         chrome.runtime.sendMessage({ 
             action: "newImages", 
-            imageUrls: imagesToSend
+            imageUrls: imagesToSend,
+            username: username
         }, (response) => {
             if (chrome.runtime.lastError) {
                 console.error('Error sending images:', chrome.runtime.lastError);
@@ -67,82 +78,105 @@ const sendBatchedImages = debounce(() => {
             }
         });
 
-        // Remove sent images from the batch
-        imagesToSend.forEach(url => imageBatch.delete(url));
-        
-        // If there are still images in the batch, schedule another send
-        if (imageBatch.size > 0) {
-            console.log(`${imageBatch.size} images remaining in batch`);
+        imageBatch.clear();
+    }
+}, 3000); // Wait 3 seconds before sending
+
+// Function to handle mutations
+function handleMutations(mutations) {
+    const newImageElements = [];
+    
+    mutations.forEach(mutation => {
+        if (mutation.addedNodes.length) {
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    // Check if node itself is an image
+                    if (node.tagName === 'IMG' && node.src) {
+                        newImageElements.push(node);
+                    }
+                    // Check for nested images
+                    const images = node.querySelectorAll('img:not([data-processed])');
+                    newImageElements.push(...images);
+                }
+            });
+        }
+    });
+
+    // Process new images and collect URLs
+    const newUrls = newImageElements
+        .map(img => processImageElement(img))
+        .filter(url => url !== null);
+    
+    console.log("New images detected:", newUrls);
+    if (newUrls.length > 0 && isSubscribed) {
+        newUrls.forEach(url => imageBatch.add(url));
+        sendBatchedImages();
+    }
+}
+
+// Function to initialize the observer
+function initializeObserver() {
+    if (!window.observerInitialized) {
+        window.observerInitialized = true;
+        console.log("Initializing observer");
+        console.log("isSubscribed:", isSubscribed);
+        // Process initial images
+        const initialUrls = processAndCollectImages();
+        console.log("Initial images found:", initialUrls);
+        if (initialUrls.length > 0 && isSubscribed) {
+            initialUrls.forEach(url => imageBatch.add(url));
             sendBatchedImages();
         }
-    }
-}, BATCH_TIMEOUT);
-
-// Install the MutationObserver only once
-if (!window.observerInitialized) {
-    window.observerInitialized = true;
-    
-    const observer = new MutationObserver(mutations => {
-        const newImageElements = [];
         
-        mutations.forEach(mutation => {
-            if (mutation.addedNodes.length) {
-                mutation.addedNodes.forEach(node => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        // Check if node itself is an image
-                        if (node.tagName === 'IMG' && node.src) {
-                            newImageElements.push(node);
-                        }
-                        // Check for nested images
-                        const images = node.querySelectorAll('img:not([data-processed])');
-                        newImageElements.push(...images);
-                    }
-                });
-            }
+        // Create and configure the observer
+        observer = new MutationObserver(handleMutations);
+        
+        // Start observing changes in the entire document body
+        observer.observe(document.body, { 
+            childList: true, 
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['src']
         });
+        
+        console.log("Observer started successfully");
+    }
+}
 
-        // Process new images
-        newImageElements.forEach(processImageElement);
-        
-        // Collect URLs for background script
-        const newUrls = newImageElements
-            .map(img => img.src)
-            .filter(src => src && src.trim() !== "");
-        
-        if (newUrls.length > 0) {
-            newUrls.forEach(url => imageBatch.add(url));
-            // If batch size exceeds limit, trigger send immediately
-            if (imageBatch.size >= MAX_BATCH_SIZE) {
-                sendBatchedImages();
-            } else {
-                // Otherwise, use debounced send
-                sendBatchedImages();
-            }
-        }
-    });
-    
-    // Process existing images on initial load
-    document.querySelectorAll('img').forEach(processImageElement);
-    
-    // Start observing changes in the entire document body
-    observer.observe(document.body, { 
-        childList: true, 
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['src']
-    });
+// Flag to track if we've received the start message
+let startMessageReceived = false;
+
+// Function to handle initialization when both conditions are met
+function handleInitialization() {
+    if (startMessageReceived && document.readyState !== 'loading') {
+        console.log("Starting initialization");
+        initializeObserver();
+    }
 }
 
 // Listen for messages from background.js
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "getImages") {
-        const imageUrls = extractImageUrls();
-        sendResponse({ imageUrls });
-    } else if (message.action === "toggleBlur") {
-        document.querySelectorAll('.hateful-meme').forEach(img => {
-            img.style.filter = img.style.filter ? '' : 'blur(10px)';
-        });
+    if (message.action === "startImageGrabbing") {
+        console.log("Received startImageGrabbing message");
+        startMessageReceived = true;
+        isSubscribed = message.isSubscribed;
+        username = message.username;
+        handleInitialization();
+        sendResponse("Image grabbing started");
+    } else if (message.action === "stopImageCollection") {
+        if (observer) {
+            observer.disconnect();
+            observer = null;
+            window.observerInitialized = false;
+            console.log("Observer stopped");
+        }
     }
-    return true;
 });
-  
+
+// Listen for DOM ready state changes
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', handleInitialization);
+} else {
+    handleInitialization();
+}
+})();
