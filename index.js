@@ -44,15 +44,11 @@ app.use('/popup', popupRouter);
 app.use('/logout', logoutRouter);
 app.use('/manageprofile',manageprofileRouter);
 
-app.get("/", (req, res) => {
-  res.render("signin");
-});
-
 app.use((req, res, next) => {
   res.status(404).render('error', {
-    error_title: "Error 404",
+    error_title: "Page Not Found",
     status_code: 404,
-    error: "The page you are looking for does not exist.",
+    error: "Oops! We couldn't find the page you're looking for. This might be because the URL was mistyped or the page has been moved. You can access SafeScroll's features through our Chrome extension popup. If you believe this is a mistake, please make sure you're using the correct URL or try accessing the page through the extension."
   });
 });
 

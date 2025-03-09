@@ -22,7 +22,18 @@ document.getElementById("otpForm").addEventListener("submit", async (event) => {
             showDangerAlert(result.error_message || "Unexpected error occurred.");
             return;
         }
-        window.location.href = '/signin';
+
+        // Clear browser history before redirecting
+        window.history.replaceState(null, '', '/signin?closed=true');
+        
+        // Prevent going back
+        history.pushState(null, '', '/signin?closed=true');
+        window.onpopstate = function(event) {
+            history.go(1);
+        };
+
+        // Redirect to signin
+        window.location.href = '/signin?closed=true';
     } catch (error) {
         console.error("Client-side error during OTP verification:", error);
         showDangerAlert("An error occurred while verifying the OTP. Please try again later.");

@@ -91,8 +91,8 @@ router.post('/update', authenticateToken, async (req, res) => {
             username: updatedUser.username,
         });
     } catch (error) {
-        errorTitle = "Error 500";
-        errorMessage = "Internal Server Error."
+        errorTitle = "Temporary Service Disruption";
+        errorMessage = "We're experiencing some technical difficulties at the moment. Our team has been notified and is working to resolve this issue. We apologize for any inconvenience."
         statusCode = 500;
         res.status(statusCode).render('error', {
             error_title: errorTitle,

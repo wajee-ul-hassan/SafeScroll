@@ -6,16 +6,17 @@ let isServerCommunicationEnabled = false;
 let currentUsername = null;
 
 // Function to store images in chrome storage with timestamp
-async function storeImagesLocally(imageUrls, username) {
+async function storeImagesLocally(images, username) {
   try {
     // Get existing stored images
     const result = await chrome.storage.local.get('storedImages');
     const storedImages = result.storedImages || [];
 
-    // Add new images with timestamp
-    const newImages = imageUrls.map(url => ({
-      url,
+    // Add new images with timestamp and isHateful flag
+    const newImages = images.map(img => ({
+      url: img.url,
       username,
+      isHateful: img.isHateful,
       timestamp: Date.now()
     }));
 
@@ -57,6 +58,7 @@ async function cleanupExpiredImages() {
 // Set up periodic cleanup (every hour)
 setInterval(cleanupExpiredImages, 60 * 60 * 1000);
 
+// Listen for messages from the server
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const subscribeUrl = "http://localhost:3000/subscribe";
   const signinUrl = "http://localhost:3000/signin";
@@ -92,7 +94,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       openedTabId = tab.id;
 
       // Check if URL is supported
-      const isSupported = tab.url && (tab.url.includes('facebook.com') || tab.url.includes('instagram.com') || tab.url.includes('pinterest.com'));
+      const isSupported = tab.url && (tab.url.includes('facebook.com') || tab.url.includes('instagram.com') || tab.url.includes('pinterest.com') || tab.url.includes('unsplash.com'));
       if (!isSupported) {
         console.log("Unsupported tab.");
         return;
@@ -125,11 +127,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       sendWithRetry();
     });
   } else if (message.action === "newImages") {
-    console.log("New image URLs detected:", message.imageUrls);
-    if (message.imageUrls && isSubscribed) {
+    console.log("New images detected:", message.images);
+    if (message.images && isSubscribed) {
       // Store images locally regardless of subscription
-      storeImagesLocally(message.imageUrls, message.username);
-      // sendToServer(message.imageUrls, message.username);
+      storeImagesLocally(message.images, message.username);
+      // Send to server if subscribed
+      // sendToServer(message.images, message.username);
     }
   } else if (message.action === "stopImageCollection") {
     // Send stop message to content script using stored tab ID
@@ -142,33 +145,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   return true;
 });
-
-async function sendToServer(imageUrls, username) {
-  if (!isSubscribed || !username) {
-    console.log("User not subscribed or no username provided");
-    return;
-  }
-
-  try {
-    const response = await fetch('http://localhost:3000/dashboard/store-image', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        imageUrls,
-        username: username
-      })
-    });
-
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-    console.log('Images successfully sent to server');
-  } catch (error) {
-    console.error('Error sending to server:', error);
-  }
-}
 
 // Function to handle tab creation and reuse
 function openTab(url, sendResponse) {

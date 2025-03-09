@@ -33,12 +33,15 @@ function applyBlurEffect(imgElement) {
 function processImageElement(img) {
     if (!processedImages.has(img.src)) {
         // Mock detection - replace with actual model later
-        const isHateful = Math.random()>0.5; // Random flagging for testing
+        const isHateful = Math.random() > 0.5; // Random flagging for testing
         if (isHateful) {
             applyBlurEffect(img);
         }
         processedImages.add(img.src);
-        return img.src;
+        return {
+            url: img.src,
+            isHateful: isHateful
+        };
     }
     return null;
 }
@@ -46,16 +49,16 @@ function processImageElement(img) {
 // Function to process and collect image URLs
 function processAndCollectImages() {
     const images = Array.from(document.querySelectorAll("img"));
-    const newUrls = [];
+    const newImages = [];
     
     images.forEach(img => {
-        const url = processImageElement(img);
-        if (url) {
-            newUrls.push(url);
+        const result = processImageElement(img);
+        if (result) {
+            newImages.push(result);
         }
     });
     
-    return newUrls;
+    return newImages;
 }
 
 // Batch of images to be sent
@@ -68,7 +71,7 @@ const sendBatchedImages = debounce(() => {
         console.log("Sending images:", imagesToSend);
         chrome.runtime.sendMessage({ 
             action: "newImages", 
-            imageUrls: imagesToSend,
+            images: imagesToSend,
             username: username
         }, (response) => {
             if (chrome.runtime.lastError) {
@@ -103,13 +106,13 @@ function handleMutations(mutations) {
     });
 
     // Process new images and collect URLs
-    const newUrls = newImageElements
+    const newImages = newImageElements
         .map(img => processImageElement(img))
-        .filter(url => url !== null);
+        .filter(result => result !== null);
     
-    console.log("New images detected:", newUrls);
-    if (newUrls.length > 0 && isSubscribed) {
-        newUrls.forEach(url => imageBatch.add(url));
+    console.log("New images detected:", newImages);
+    if (newImages.length > 0 && isSubscribed) {
+        newImages.forEach(image => imageBatch.add(image));
         sendBatchedImages();
     }
 }
@@ -121,10 +124,10 @@ function initializeObserver() {
         console.log("Initializing observer");
         console.log("isSubscribed:", isSubscribed);
         // Process initial images
-        const initialUrls = processAndCollectImages();
-        console.log("Initial images found:", initialUrls);
-        if (initialUrls.length > 0 && isSubscribed) {
-            initialUrls.forEach(url => imageBatch.add(url));
+        const initialImages = processAndCollectImages();
+        console.log("Initial images found:", initialImages);
+        if (initialImages.length > 0 && isSubscribed) {
+            initialImages.forEach(image => imageBatch.add(image));
             sendBatchedImages();
         }
         

@@ -10,8 +10,8 @@ router.get('/', authenticateToken, (req, res) => {
     const user = req.user;
     
     if (user !== null) {
-        const errorTitle = "Error 404";
-        const errorMessage = "Page not Found.";
+        const errorTitle = "Password Reset Page Not Found";
+        const errorMessage = "We couldn't find the password reset page you're looking for. This might happen if the reset link has expired or is invalid. Please try the following:\n\n1. Return to the sign-in page and click 'Forgot Password' to generate a new reset link\n2. Check if you copied the entire URL from your email\n3. Make sure you're using the most recent password reset link if you've requested multiple times";
         const statusCode = 404;
         return res.status(statusCode).render('error', {
             error_title: errorTitle,
@@ -79,9 +79,9 @@ router.post('/', async (req, res) => {
 
         // Respond with an error page if an error occurs
         res.status(500).render('error', {
-            error_title: "Error 500",
+            error_title: "Temporary Service Disruption",
             status_code: 500,
-            error: "Internal Server Error"
+            error: "We're experiencing some technical difficulties at the moment. Our team has been notified and is working to resolve this issue.We apologize for any inconvenience."
         });
     }
 });
