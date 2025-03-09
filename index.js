@@ -15,6 +15,8 @@ const dashboardRouter = require('./routes/dashboard');
 const errorRouter = require('./routes/error');
 const logoutRouter = require('./routes/logout');
 const manageprofileRouter=require('./routes/manageprofile');
+const signinSuccessRouter = require('./routes/signin-success');
+const subscriptionSuccessRouter = require('./routes/subscription-success');
 const cors = require('cors');
 const app = express();
 
@@ -43,7 +45,8 @@ app.use('/error', errorRouter);
 app.use('/popup', popupRouter);
 app.use('/logout', logoutRouter);
 app.use('/manageprofile',manageprofileRouter);
-
+app.use('/signin-success', signinSuccessRouter);
+app.use('/subscription-success', subscriptionSuccessRouter);
 app.use((req, res, next) => {
   res.status(404).render('error', {
     error_title: "Page Not Found",

@@ -1,65 +1,246 @@
+:root {
+  --primary-color: #007bff;
+  --primary-dark: #0056b3;
+  --success-color: #28a745;
+  --text-color: #2c3e50;
+  --light-text: #666;
+  --light-bg: #f8f9fa;
+  --border-radius: 20px;
+  --box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
 body {
-  background-color: #f8f9fa;
-  height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  margin: 0;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-color);
+  padding: 1rem;
+}
+
+.success-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
 }
 
 .success-card {
   background: white;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
-  width: 90%;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 2.5rem;
   text-align: center;
-  padding: 2rem;
+  position: relative;
+  animation: card-appear 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .success-icon {
+  position: relative;
   width: 80px;
   height: 80px;
-  background-color: #007bff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1.5rem;
+  margin: 0 auto 2rem;
 }
 
-.success-icon svg {
-  width: 40px;
-  height: 40px;
-  color: white;
+.success-icon i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  color: var(--success-color);
+  z-index: 2;
+  opacity: 0;
+  animation: check-appear 0.4s ease-out 0.6s forwards;
+}
+
+.checkmark-circle {
+  width: 100%;
+  height: 100%;
+}
+
+.checkmark-circle-path {
+  stroke: var(--success-color);
+  stroke-width: 2;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: stroke-draw 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
+}
+
+.content-section {
+  animation: content-appear 0.6s ease-out 0.4s both;
 }
 
 .success-title {
-  color: #2c3e50;
-  font-size: 1.5rem;
+  color: var(--text-color);
+  font-size: 1.8rem;
   font-weight: 600;
   margin-bottom: 1rem;
 }
 
 .success-message {
-  color: #666;
+  color: var(--light-text);
   font-size: 1.1rem;
   line-height: 1.6;
   margin-bottom: 2rem;
 }
 
-.success-note {
-  background-color: #f8f9fa;
-  border-radius: 8px;
+.features-section {
+  margin: 2rem 0;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  background: var(--light-bg);
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+  animation: feature-appear 0.4s ease-out both;
+}
+
+.feature-item:hover {
+  transform: translateX(5px);
+}
+
+.feature-item:nth-child(1) {
+  animation-delay: 0.6s;
+}
+
+.feature-item:nth-child(2) {
+  animation-delay: 0.8s;
+}
+
+.feature-item i {
+  color: var(--primary-color);
+  font-size: 1.2rem;
+}
+
+.feature-item span {
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: rgba(0, 123, 255, 0.1);
+  border-radius: 12px;
   padding: 1rem;
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 1.5rem;
+  margin: 2rem 0;
+  text-align: left;
+  animation: info-appear 0.4s ease-out 1s both;
+}
+
+.info-box i {
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  margin-top: 0.2rem;
+}
+
+.info-box p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--primary-dark);
+}
+
+
+@keyframes card-appear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes check-appear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes stroke-draw {
+  from {
+    stroke-dashoffset: 166;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes content-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes feature-appear {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes info-appear {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 576px) {
   .success-card {
-    width: 95%;
-    padding: 1.5rem;
+    padding: 2rem;
+    margin: 1rem;
+  }
+
+  .success-title {
+    font-size: 1.6rem;
+  }
+
+  .success-icon {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 1.5rem;
+  }
+
+  .feature-item {
+    padding: 0.6rem;
   }
 }

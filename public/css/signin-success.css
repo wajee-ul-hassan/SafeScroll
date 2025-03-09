@@ -1,0 +1,197 @@
+:root {
+    --primary-color: #007bff;
+    --success-color: #28a745;
+    --text-color: #2c3e50;
+    --secondary-text: #666;
+    --light-bg: #f8f9fa;
+    --border-radius: 15px;
+    --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 1rem;
+}
+
+.success-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    padding: 2.5rem;
+    position: relative;
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    background-color: var(--success-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    animation: scale-in 0.5s ease-out;
+}
+
+.success-icon i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.success-title {
+    color: var(--text-color);
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    animation: fade-in 0.5s ease-out 0.3s both;
+}
+
+.success-message {
+    color: var(--secondary-text);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    animation: fade-in 0.5s ease-out 0.5s both;
+}
+
+.info-sections {
+    display: grid;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    animation: fade-in 0.5s ease-out 0.7s both;
+}
+
+.access-guide,
+.subscription-info {
+    background: var(--light-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: left;
+}
+
+.access-guide h2,
+.subscription-info h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.access-guide p,
+.subscription-info p {
+    color: var(--secondary-text);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.subscribe-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.subscribe-btn:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    color: white;
+}
+
+.subscribe-btn i {
+    transition: transform 0.3s ease;
+}
+
+.subscribe-btn:hover i {
+    transform: translateX(4px);
+}
+
+.auto-close-note {
+    position: absolute;
+    bottom: -2rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: var(--secondary-text);
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+@keyframes scale-in {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 576px) {
+    .success-card {
+        width: 95%;
+        padding: 2rem 1.5rem;
+    }
+
+    .success-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .success-icon i {
+        font-size: 2rem;
+    }
+
+    .success-title {
+        font-size: 1.5rem;
+    }
+
+    .success-message {
+        font-size: 1rem;
+    }
+
+    .info-sections {
+        gap: 1rem;
+    }
+
+    .access-guide,
+    .subscription-info {
+        padding: 1.25rem;
+    }
+
+    .auto-close-note {
+        bottom: -1.5rem;
+        font-size: 0.8rem;
+    }
+}
+  
