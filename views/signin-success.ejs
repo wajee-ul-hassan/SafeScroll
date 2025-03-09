@@ -28,6 +28,7 @@
                 <p>Find the SafeScroll icon in your browser's extension menu to access all features.</p>
             </div>
 
+            <% if (!isSubscribed) { %>
             <div class="subscription-info">
                 <h2><i class="fas fa-star"></i> Premium Features</h2>
                 <p>Unlock advanced protection and exclusive features with a SafeScroll subscription.</p>
@@ -36,39 +37,12 @@
                     <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
-        </div>
-
-        <div class="auto-close-note">
-            This window will close automatically in a few seconds...
+            <% } %>
         </div>
     </div>
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        // Auto-close countdown
-        let timeLeft = 5;
-        const noteElement = document.querySelector('.auto-close-note');
-        
-        const countdown = setInterval(() => {
-            timeLeft--;
-            if (timeLeft <= 0) {
-                clearInterval(countdown);
-                if (window.opener) {
-                    window.close();
-                }
-            } else {
-                noteElement.textContent = `This window will close automatically in ${timeLeft} seconds...`;
-            }
-        }, 1000);
-
-        // Prevent going back
-        history.pushState(null, '', window.location.pathname);
-        window.onpopstate = function(event) {
-            history.go(1);
-        };
-    </script>
 </body>
 
 </html>

@@ -125,6 +125,19 @@ body {
   color: #0056b3;
   text-decoration: underline;
 }
+.btn-no-style {
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: #6c757d !important;
+  padding-right: 12px !important;
+}
+.btn-no-style:hover, .btn-no-style:focus, .btn-no-style:active {
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: #6c757d !important;
+}
 
 #loading-bar-container {
   display: none;

@@ -1,3 +1,29 @@
+// Add password visibility toggle
+document.addEventListener('DOMContentLoaded', () => {
+    const togglePasswordButton = document.querySelector('.toggle-password');
+    const passwordInput = document.getElementById('password');
+
+    togglePasswordButton.addEventListener('click', () => {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        // Toggle eye icon
+        const icon = togglePasswordButton.querySelector('i');
+        icon.classList.toggle('fa-eye');
+        icon.classList.toggle('fa-eye-slash');
+    });
+});
+
+function validatePassword(password) {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()]/.test(password);
+
+    return password.length >= minLength && 
+           hasUpperCase && 
+           hasSpecialChar;
+}
+
 function validateForm(formObject) {
     // Check if any field is empty
     for (const [key, value] of Object.entries(formObject)) {
@@ -20,16 +46,15 @@ function validateForm(formObject) {
         showDangerAlert('Invalid email format');
         return false;
     }
-    // Check password strength
-    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/;
-    if (!passwordPattern.test(formObject.password)) {
-        showDangerAlert('Password must be at least 8 characters long, include at least one letter, one number, and one special character.');
+
+    // Check password strength using the simplified validation function
+    if (!validatePassword(formObject.password)) {
+        showDangerAlert('Password must be at least 8 characters long, include one uppercase letter and one special character');
         return false;
     }
 
     return true;
 }
-
 
 async function submitForm(event) {
     event.preventDefault();
@@ -64,7 +89,6 @@ async function submitForm(event) {
     } finally {
         hideLoadingBar();
     }
-
 }
 
 // Show loading bar

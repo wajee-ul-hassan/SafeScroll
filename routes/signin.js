@@ -10,7 +10,6 @@ router.post("/", authenticateToken, async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = req.user;
-
         if (user !== null) {
             return res.status(404).render('error', {
                 error_title: "Already Signed In",
@@ -20,13 +19,20 @@ router.post("/", authenticateToken, async (req, res) => {
         }
 
         const foundUser = await User.findOne({ email });
-
+        let isSubscribed = false;
         if (!foundUser) {
             return res.status(401).json({
                 error_message: "The email or password you entered is incorrect. Please try again."
             });
         }
+        const { subscription } = foundUser;
+        if (subscription && subscription.startDate && subscription.endDate) {
+            const currentDate = Date.now();
+            const startDate = new Date(subscription.startDate).getTime();
+            const endDate = new Date(subscription.endDate).getTime();
 
+            isSubscribed = currentDate >= startDate && currentDate <= endDate;
+        }
         // Compare the provided password with the stored hashed password
         const isPasswordValid = await bcrypt.compare(password, foundUser.password);
 
@@ -53,7 +59,7 @@ router.post("/", authenticateToken, async (req, res) => {
             sameSite: 'lax',
             maxAge: 600000 // 10 minutes
         });
-        res.status(200).send('Sign-in successful');
+        res.status(200).json({ message: 'Sign-in successful', isSubscribed });
 
     } catch (error) {
         console.error('Error during sign-in:', error);
