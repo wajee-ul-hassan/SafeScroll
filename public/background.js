@@ -16,7 +16,7 @@ async function storeImagesLocally(images, username) {
     const newImages = images.map(img => ({
       url: img.url,
       username,
-      isHateful: img.isHateful,
+      isHateful: img.isInappropriate,
       timestamp: Date.now()
     }));
 
@@ -94,7 +94,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       openedTabId = tab.id;
 
       // Check if URL is supported
-      const isSupported = tab.url && (tab.url.includes('facebook.com') || tab.url.includes('instagram.com') || tab.url.includes('pinterest.com') || tab.url.includes('unsplash.com'));
+      const isSupported = tab.url && (tab.url.includes('facebook.com') || tab.url.includes('instagram.com') || tab.url.includes('pinterest.com') || tab.url.includes('pexels.com') || tab.url.includes('unsplash.com'));
       if (!isSupported) {
         console.log("Unsupported tab.");
         return;

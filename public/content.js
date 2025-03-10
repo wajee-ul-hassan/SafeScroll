@@ -1,13 +1,13 @@
-(function() {
+(function () {
     // Add this at the beginning of content.js
     console.log('Content script loaded');
-  
+
     // Track processed images
     const processedImages = new Set();
     let isSubscribed = false;
     let username = '';
     let observer = null; // Store observer reference
-  
+
     // Debounce function to limit how often we send messages
     function debounce(func, wait) {
         let timeout;
@@ -20,7 +20,7 @@
             timeout = setTimeout(later, wait);
         };
     }
-  
+
     // Add blur effect to images
     function applyBlurEffect(imgElement) {
         imgElement.style.filter = 'blur(10px)';
@@ -28,68 +28,107 @@
         imgElement.classList.add('hateful-meme');
         imgElement.dataset.processed = 'true';
     }
-  
-    // Process individual image elements with validity check
-    function processImageElement(img) {
-        console.log("Processing image:", img.src);
-  
-        // Ensure the image has a source and it starts with http or https
-        if (!img.src || !/^https?:\/\//i.test(img.src)) {
-            return null;
-        }
-  
-        // If the image hasn't finished loading, attach a one-time load listener to reprocess it
-        if (!img.complete) {
-            img.addEventListener('load', () => processImageElement(img), { once: true });
-            return null;
-        }
-  
-        // Filter out images that failed to load (naturalWidth is 0)
-        if (img.naturalWidth === 0) {
-            return null;
-        }
-  
-        if (!processedImages.has(img.src)) {
-            // Mock detection - replace with actual model later
-            const isHateful = Math.random() > 0.5; // Random flagging for testing
-            if (isHateful) {
-                applyBlurEffect(img);
+    // Function to check if an image is inappropriate using the Flask API
+    async function checkImageInappropriate(imageUrl) {
+        try {
+            const response = await fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ image_url: imageUrl })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            console.log("Processed image:", img.src);
+
+            const data = await response.json();
+            console.log("API Response:", data); // Debug log
+            return {
+                isInappropriate: data.is_inappropriate,
+                confidence: data.confidence
+            };
+        } catch (error) {
+            console.error('Error checking image:', error);
+            return { isInappropriate: false, confidence: 0 };
+        }
+    }
+
+    // Function to process an image element
+    async function processImageElement(img) {
+        // Skip if already processed or invalid URL
+        if (!img.src || !img.src.startsWith('http') || processedImages.has(img.src)) {
+            return null;
+        }
+
+        // Wait for image to load to get dimensions
+        if (!img.complete) {
+            try {
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                });
+            } catch (error) {
+                console.error('Error loading image:', error);
+                return null;
+            }
+        }
+
+        // Check image dimensions
+        if (img.naturalWidth < 200 || img.naturalHeight < 200) {
+            console.log(`Skipping small image: ${img.src} (${img.naturalWidth}x${img.naturalHeight})`);
+            processedImages.add(img.src); // Mark as processed to avoid rechecking
+            return null;
+        }
+
+        try {
+            const result = await checkImageInappropriate(img.src);
+            console.log("Processing image:", img.src, "Result:", result); // Debug log
+
+            // Mark image as processed
             processedImages.add(img.src);
+
+            if (result.isInappropriate && result.confidence > 0.7) {
+                applyBlurEffect(img);
+                return {
+                    url: img.src,
+                    isInappropriate: true,
+                    confidence: result.confidence,
+                };
+            }
+
             return {
                 url: img.src,
-                isHateful: isHateful
+                isInappropriate: false,
+                confidence: result.confidence,
             };
+        } catch (error) {
+            console.error('Error processing image:', error);
+            return null;
         }
-        return null;
     }
-  
+
     // Function to process and collect image URLs
-    function processAndCollectImages() {
+    async function processAndCollectImages() {
         const images = Array.from(document.querySelectorAll("img"));
-        const newImages = [];
-        
-        images.forEach(img => {
-            const result = processImageElement(img);
-            if (result) {
-                newImages.push(result);
-            }
-        });
-        
-        return newImages;
+        const processedResults = await Promise.all(
+            images.map(img => processImageElement(img))
+        );
+        return processedResults.filter(result => result !== null);
     }
-  
+
     // Batch of images to be sent
     let imageBatch = new Set();
-  
+
     // Function to send batched images
     const sendBatchedImages = debounce(() => {
         if (imageBatch.size > 0) {
             const imagesToSend = Array.from(imageBatch);
-            console.log("Sending images:", imagesToSend);
-            chrome.runtime.sendMessage({ 
-                action: "newImages", 
+            console.log("Sending batch to background:", imagesToSend); // Debug log
+
+            chrome.runtime.sendMessage({
+                action: "newImages",
                 images: imagesToSend,
                 username: username
             }, (response) => {
@@ -99,15 +138,15 @@
                     console.log(`Successfully sent ${imagesToSend.length} images`);
                 }
             });
-  
+
             imageBatch.clear();
         }
     }, 3000); // Wait 3 seconds before sending
-  
+
     // Function to handle mutations
-    function handleMutations(mutations) {
+    async function handleMutations(mutations) {
         const newImageElements = [];
-        
+
         mutations.forEach(mutation => {
             if (mutation.addedNodes.length) {
                 mutation.addedNodes.forEach(node => {
@@ -123,51 +162,54 @@
                 });
             }
         });
-  
-        // Process new images and collect URLs
-        const newImages = newImageElements
-            .map(img => processImageElement(img))
-            .filter(result => result !== null);
-        
-        console.log("New images detected:", newImages);
-        if (newImages.length > 0 && isSubscribed) {
-            newImages.forEach(image => imageBatch.add(image));
+
+        // Process new images and collect results
+        const processPromises = newImageElements.map(img => processImageElement(img));
+        const results = await Promise.all(processPromises);
+        const validResults = results.filter(result => result !== null);
+
+        console.log("New processed images:", validResults); // Debug log
+
+        if (validResults.length > 0 && isSubscribed) {
+            validResults.forEach(result => imageBatch.add(result));
             sendBatchedImages();
         }
     }
-  
+
     // Function to initialize the observer
-    function initializeObserver() {
+    async function initializeObserver() {
         if (!window.observerInitialized) {
             window.observerInitialized = true;
             console.log("Initializing observer");
             console.log("isSubscribed:", isSubscribed);
+
             // Process initial images
-            const initialImages = processAndCollectImages();
-            console.log("Initial images found:", initialImages);
+            const initialImages = await processAndCollectImages();
+            console.log("Initial images processed:", initialImages);
+
             if (initialImages.length > 0 && isSubscribed) {
                 initialImages.forEach(image => imageBatch.add(image));
                 sendBatchedImages();
             }
-            
+
             // Create and configure the observer
             observer = new MutationObserver(handleMutations);
-            
+
             // Start observing changes in the entire document body
-            observer.observe(document.body, { 
-                childList: true, 
+            observer.observe(document.body, {
+                childList: true,
                 subtree: true,
                 attributes: true,
                 attributeFilter: ['src']
             });
-            
+
             console.log("Observer started successfully");
         }
     }
-  
+
     // Flag to track if we've received the start message
     let startMessageReceived = false;
-  
+
     // Function to handle initialization when both conditions are met
     function handleInitialization() {
         if (startMessageReceived && document.readyState !== 'loading') {
@@ -175,7 +217,7 @@
             initializeObserver();
         }
     }
-  
+
     // Listen for messages from background.js
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (message.action === "startImageGrabbing") {
@@ -194,12 +236,11 @@
             }
         }
     });
-  
+
     // Listen for DOM ready state changes
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', handleInitialization);
     } else {
         handleInitialization();
     }
-  })();
-  
+})();
