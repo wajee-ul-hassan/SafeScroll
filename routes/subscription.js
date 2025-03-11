@@ -27,7 +27,7 @@ router.get("/", authenticateToken, async (req, res) => {
       });
     }
     else {
-      res.redirect('/dashboard');
+      res.render('subscription-success');
     }
   } else {
     res.redirect('/signin');
@@ -54,23 +54,17 @@ router.post("/create-checkout-session", authenticateToken, async (req, res) => {
       res.status(200).json({ url: session.url });
     }
     else {
-      errorTitle = "Error 404";
-      errorMessage = "User not Found"
-      statusCode = 404;
-      res.status(statusCode).render('error', {
-        error_title: errorTitle,
-        status_code: statusCode,
-        error: errorMessage
+      return res.status(404).render('error', {
+        error_title: "Authentication Required",
+        status_code: 404,
+        error: "Please sign in to complete your subscription purchase. If you're already signed in, try signing out and back in."
       });
     }
   } catch (error) {
-    errorTitle = "Error 500";
-    errorMessage = "An error occurred while subscription"
-    statusCode = 500;
-    res.status(statusCode).render('error', {
-      error_title: errorTitle,
-      status_code: statusCode,
-      error: errorMessage
+    return res.status(500).render('error', {
+      error_title: "Payment Processing Error",
+      status_code: 500,
+      error: "We encountered an issue while processing your subscription payment. Please try again or contact support if the problem persists."
     });
   }
 });
@@ -81,13 +75,10 @@ router.get("/verify-payment", authenticateToken, async (req, res) => {
     const sessionID = req.query.sessionID;
 
     if (!username || !sessionID) {
-      const errorTitle = "Error 404";
-      const errorMessage = "Page not Found.";
-      const statusCode = 404;
-      return res.status(statusCode).render('error', {
-        error_title: errorTitle,
-        status_code: statusCode,
-        error: errorMessage
+      return res.status(404).render('error', {
+        error_title: "Invalid Payment Verification",
+        status_code: 404,
+        error: "We couldn't verify your payment because some required information is missing. Please try the subscription process again."
       });
     }
 
@@ -100,23 +91,23 @@ router.get("/verify-payment", authenticateToken, async (req, res) => {
       const endDate = new Date(startDate);
       endDate.setMonth(startDate.getMonth() + 1); // Add one month
       const user = await User.findOne({ username: username });
+      
       if (!user) {
-        errorTitle = "Error 404";
-        errorMessage = "User not found."
-        statusCode = 404;
-        return res.status(statusCode).render('error', {
-          error_title: errorTitle,
-          status_code: statusCode,
-          error: errorMessage
+        return res.status(404).render('error', {
+          error_title: "Account Not Found",
+          status_code: 404,
+          error: "We couldn't find your account to activate the subscription. Please contact support for assistance."
         });
       }
+      
       user.subscription = {
         startDate: startDate,
         endDate: endDate,
       };
 
       await user.save();
-      res.redirect("/dashboard");
+      // Render success page instead of redirecting to dashboard
+      res.render('subscription-success');
     } else {
       // Payment was not successful
       console.error('Payment was not successful:', session.payment_status);
@@ -124,13 +115,10 @@ router.get("/verify-payment", authenticateToken, async (req, res) => {
     }
   } catch (error) {
     console.error('Error verifying payment:', error);
-    errorTitle = "Error 500";
-    errorMessage = "An error occurred while subscription"
-    statusCode = 500;
-    res.status(statusCode).render('error', {
-      error_title: errorTitle,
-      status_code: statusCode,
-      error: errorMessage
+    return res.status(500).render('error', {
+      error_title: "Subscription Activation Error",
+      status_code: 500,
+      error: "We had trouble activating your subscription. If your payment was successful, please contact support to resolve this issue."
     });
   }
 });

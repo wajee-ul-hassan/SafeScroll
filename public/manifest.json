@@ -1,19 +1,31 @@
 {
   "manifest_version": 3,
-  "name": "Safescroll",
+  "name": "SafeScroll",
   "version": "1.0",
-  "description": "Blurs hateful memes by detecting and filtering flagged images in the DOM.",
-  "permissions": ["storage", "activeTab", "scripting", "tabs"],
-  "host_permissions": ["<all_urls>"],
+  "description": "A Chrome extension to detect and filter hateful memes",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": "safescroll.png"
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "run_at": "document_end"
+      "matches": [
+        "https://*.instagram.com/*",
+        "https://*.facebook.com/*",
+        "https://*.pinterest.com/*",
+        "https://*.unsplash.com/*",
+        "https://*.pexels.com/*",
+        "https://*.reddit.com/*"
+      ],
+      "js": ["content.js"]
     }
   ],
   "background": {

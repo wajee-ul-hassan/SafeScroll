@@ -1,65 +1,178 @@
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --light-bg: #f8f9fa;
+  --border-radius: 10px;
+}
+
 body {
-  font-family: "Poppins", sans-serif;
-  background-color: #f8f9fa;
-  height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  margin: 0;
+}
+
+.main-container {
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
+  padding: 1rem;
 }
-.form-container {
-  background-color: #ffffff;
-  padding: 2rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  max-width: 500px;
+
+.signup-container {
   width: 100%;
+  max-width: 450px;
+  padding: 2.5rem;
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
-.input-group-text i {
-  font-size: 1.25rem;
-  margin-left: 5px;
+
+.signup-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
 }
-/* Loading bar container */
+
+.signup-header h2 {
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.signup-header p {
+  color: var(--secondary-color);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.input-group {
+  border: 2px solid #e9ecef;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.input-group:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
+}
+
+.input-group .form-control {
+  border: none;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+}
+
+.input-group .form-control:focus {
+  box-shadow: none;
+}
+
+.input-group-text {
+  background-color: white;
+  border: none;
+  color: var(--secondary-color);
+  padding-right: 1rem;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.already-account {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--light-bg);
+}
+
+.already-account p {
+  margin-bottom: 0;
+  color: var(--secondary-color);
+}
+
+.btn-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+.btn-no-style {
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: #6c757d !important;
+  padding-right: 12px !important;
+}
+.btn-no-style:hover, .btn-no-style:focus, .btn-no-style:active {
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: #6c757d !important;
+}
+
 #loading-bar-container {
   display: none;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 5px;
+  height: 3px;
   background-color: #f3f3f3;
+  z-index: 1000;
 }
 
-/* Loading bar */
 #loading-bar {
   width: 0;
   height: 100%;
-  background-color: #007bff;
+  background-color: var(--primary-color);
   animation: loading 2s ease-out infinite;
 }
 
-/* Loading bar animation */
 @keyframes loading {
-  from {
-    width: 0%;
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+@media (max-width: 576px) {
+  .signup-container {
+      margin: 1rem;
+      padding: 1.5rem;
   }
 
-  to {
-    width: 100%;
+  .signup-header h2 {
+      font-size: 1.75rem;
+  }
+
+  .input-group .form-control {
+      padding: 0.6rem 0.8rem;
   }
 }
-.already-account {
-  text-align: center;
-  margin-top: 10px;
-}
-
-.btn-link {
-  text-decoration: none;
-  color: #007bff;
-  font-weight: 400;
-}
-
-.btn-link:hover {
-  text-decoration: underline;
-  color: #0056b3;
-}
-

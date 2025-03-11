@@ -6,21 +6,31 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 // Endpoint to render the email page
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     const email = req.query.email ? decodeURIComponent(req.query.email) : undefined;
     const password = req.query.password ? decodeURIComponent(req.query.password) : undefined;
     const username = req.query.username ? decodeURIComponent(req.query.username) : undefined;
     const temptoken = req.query.temptoken ? decodeURIComponent(req.query.temptoken) : undefined;
+
     if (!email || !password || !username) {
         return res.status(404).render('error', {
-            error_title: "Error 404",
+            error_title: "Account Not Found",
             status_code: 404,
-            error: "Page cannot be found",
+            error: "We couldn't find your account in our system. This might happen if your account was recently deleted or if there's a temporary issue. Please try signing out and signing in again through the SafeScroll extension popup. If the problem persists, you may need to create a new account."
         });
     }
-    else {
-        res.render('emailpage', { email: email, username: username, password: password, temptoken: temptoken });
+
+    // Check if user exists and is already verified
+    const existingUser = await User.findOne({ email });
+    if (existingUser && existingUser.isVerified) {
+        return res.status(403).render('error', {
+            error_title: "Email Already Verified",
+            status_code: 403,
+            error: "This email has already been verified. Please sign in to your account through the SafeScroll extension popup."
+        });
     }
+
+    res.render('emailpage', { email: email, username: username, password: password, temptoken: temptoken });
 });
 
 router.post("/verify-otp", async (req, res) => {
@@ -56,12 +66,23 @@ router.post("/verify-otp", async (req, res) => {
                 error_message: "Invalid or expired OTP.",
             });
         }
+
+        // Check if user exists and is already verified
+        const existingVerifiedUser = await User.findOne({ email, isVerified: true });
+        if (existingVerifiedUser) {
+            return res.status(403).json({
+                error_message: "This email has already been verified. Please sign in to your account.",
+            });
+        }
+
         const user = await User.findOne({ username: username });
         const hashedPassword = await bcrypt.hash(password, 10);
         if (user) {
             user.username = username;
             user.email = email;
             user.password = hashedPassword;
+            user.isVerified = true;
+            user.verificationCompleted = true; // Add flag to indicate verification process is complete
             await user.save();
         }
         else {
@@ -71,6 +92,7 @@ router.post("/verify-otp", async (req, res) => {
                 email,
                 password: hashedPassword,
                 isVerified: true,
+                verificationCompleted: true // Add flag to indicate verification process is complete
             });
 
             await newUser.save();

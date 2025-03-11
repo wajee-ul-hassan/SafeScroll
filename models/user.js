@@ -29,7 +29,21 @@ const userSchema = new mongoose.Schema({
     isVerified: {
         type: Boolean,
         default: false // To track whether the email is verified
-    },
+    }
+    // images: [{
+    //     url: {
+    //         type: String,
+    //         required: true
+    //     },
+    //     addedAt: {
+    //         type: Date,
+    //         default: Date.now
+    //     },
+    //     isHateful:{
+    //         type: Boolean,
+    //         default: false
+    //     }
+    // }]
 });
 
 // Create and export User model

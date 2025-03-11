@@ -50,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const data = await response.json(); // Expect JSON data from the endpoint
         const { isLoggedIn, isSubscribed, username } = data;
-
         // Update the navbar
         if (navbar) {
             let navbarHTML = `
@@ -115,7 +114,92 @@ document.addEventListener('DOMContentLoaded', async () => {
             noteSection.style.display = 'none';
         }
     }
+    document.getElementById('dashboard').addEventListener('click', async () => {
+        // Retrieve stored images from chrome.storage.local
+        const result = await chrome.storage.local.get('storedImages');
+        const images = result.storedImages || [];
+
+        // Send the images to your backend
+        fetch('http://localhost:3000/dashboard', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ images })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log("Images posted successfully");
+                } else {
+                    console.error('Error posting images:', data.message);
+                }
+            })
+            .catch(err => console.error('Error posting images:', err));
+    });
+
 });
+document.addEventListener("DOMContentLoaded", () => {
+    const checkbox = document.getElementById("enableExtensionSwitch");
+
+    // Restore the saved checkbox state when the popup loads
+    chrome.storage.local.get("checkboxState", (result) => {
+        checkbox.checked = result.checkboxState || false;
+    });
+
+    checkbox.addEventListener("change", async () => {
+        // Save the new checkbox state
+        chrome.storage.local.set({ checkboxState: checkbox.checked }, () => {
+            console.log("Checkbox state saved:", checkbox.checked);
+        });
+
+        if (checkbox.checked) {
+            try {
+                // Get the current subscription and username state
+                const response = await fetch('http://localhost:3000/popup');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch popup content.');
+                }
+                const data = await response.json();
+                const { isSubscribed, username } = data;
+
+                // Send startImageCollection message with subscription status
+                chrome.runtime.sendMessage({
+                    action: "startImageCollection",
+                    isSubscribed,
+                    username
+                }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        console.error('Error starting collection:', chrome.runtime.lastError);
+                        // Revert checkbox state if there's an error
+                        checkbox.checked = false;
+                        chrome.storage.local.set({ checkboxState: false });
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching subscription status:', error);
+            }
+        } else {
+            // Stop image collection when unchecked
+            console.log("Stopping image collection");
+            chrome.runtime.sendMessage({
+                action: "stopImageCollection"
+            }, (response) => {
+                if (chrome.runtime.lastError) {
+                    console.error('Error stopping collection:', chrome.runtime.lastError);
+                } else if (response.status === 'error') {
+                    console.error('Failed to stop collection:', response.message);
+                } else {
+                    console.log("Image collection stopped successfully");
+                }
+            });
+        }
+    });
+    
+});
+
+
+
+
 
 
 

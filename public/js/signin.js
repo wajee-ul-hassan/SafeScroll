@@ -48,7 +48,7 @@ async function signinFORM(event) {
             showDangerAlert(`${errorData.error_message}`);
             return;
         }
-        window.location.href = '/subscribe';
+        window.location.href = '/signin-success';
     } catch (error) {
         showDangerAlert('An Error Occurred while Signing in');
     }

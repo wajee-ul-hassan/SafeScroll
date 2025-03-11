@@ -15,7 +15,9 @@ const dashboardRouter = require('./routes/dashboard');
 const errorRouter = require('./routes/error');
 const logoutRouter = require('./routes/logout');
 const manageprofileRouter=require('./routes/manageprofile');
-
+const signinSuccessRouter = require('./routes/signin-success');
+const subscriptionSuccessRouter = require('./routes/subscription-success');
+const cors = require('cors');
 const app = express();
 
 // Connect to MongoDB
@@ -27,7 +29,6 @@ app.set("views", path.join(__dirname, "views"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-// Middleware to parse JSON and form data
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -44,18 +45,22 @@ app.use('/error', errorRouter);
 app.use('/popup', popupRouter);
 app.use('/logout', logoutRouter);
 app.use('/manageprofile',manageprofileRouter);
-
-app.get("/", (req, res) => {
-  res.render("signin");
-});
-
+app.use('/signin-success', signinSuccessRouter);
+app.use('/subscription-success', subscriptionSuccessRouter);
 app.use((req, res, next) => {
   res.status(404).render('error', {
-    error_title: "Error 404",
+    error_title: "Page Not Found",
     status_code: 404,
-    error: "The page you are looking for does not exist.",
+    error: "Oops! We couldn't find the page you're looking for. This might be because the URL was mistyped or the page has been moved. You can access SafeScroll's features through our Chrome extension popup. If you believe this is a mistake, please make sure you're using the correct URL or try accessing the page through the extension."
   });
 });
+
+app.use(cors({
+  origin: 'chrome-extension://kdfbjhgfobhcnlgilleefogemmmjkhkk',
+  credentials: true,
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
