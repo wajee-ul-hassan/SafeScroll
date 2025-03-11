@@ -22,7 +22,8 @@
         "https://*.facebook.com/*",
         "https://*.pinterest.com/*",
         "https://*.unsplash.com/*",
-        "https://*.pexels.com/*"
+        "https://*.pexels.com/*",
+        "https://*.reddit.com/*"
       ],
       "js": ["content.js"]
     }
