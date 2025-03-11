@@ -78,7 +78,8 @@ function isSupportedUrl(url) {
         url.includes('instagram.com') || 
         url.includes('pinterest.com') || 
         url.includes('unsplash.com') ||
-        url.includes('pexels.com')
+        url.includes('pexels.com') ||
+        url.includes('reddit.com')
     );
 }
 

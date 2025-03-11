@@ -95,21 +95,21 @@
         }
 
         // Check image dimensions
-        if (img.naturalWidth < 100 || img.naturalHeight < 100) {
+        if (img.naturalWidth < 50 || img.naturalHeight < 50) {
             console.log(`Skipping small image: ${img.src} (${img.naturalWidth}x${img.naturalHeight})`);
             processedImages.add(img.src); // Mark as processed to avoid rechecking
             return null;
         }
 
         try {
-            const result = await checkImageInappropriate(img.src);
-            // const result = { isInappropriate: true, confidence: 0 };
+            // const result = await checkImageInappropriate(img.src);
+            const result = { isInappropriate: true, confidence: 0 };
             console.log("Processing image:", img.src, "Result:", result); // Debug log
 
             // Mark image as processed
             processedImages.add(img.src);
 
-            if (result.isInappropriate && result.confidence > 0.76) {
+            if (result.isInappropriate && result.confidence > -1) {
                 applyBlurEffect(img);
                 return {
                     url: img.src,
