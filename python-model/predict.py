@@ -91,7 +91,7 @@ def load_model(model_path):
         else:
             raise ValueError("The model file does not contain a valid state dictionary")
             
-        print("Model weights loaded successfully")
+        # print("Model weights loaded successfully")
     except Exception as e:
         print(f"Error loading model weights: {str(e)}")
         raise e

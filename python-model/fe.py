@@ -16,7 +16,7 @@ import re
 # ==================================
 # 🔹 Step 1: Configure API & Setup
 # ==================================
-API_KEY = "AIzaSyAzUG3TgCRBf5NTO44jqLbQA9jJa6X0Pkk"  # Replace with your actual API Key
+API_KEY = "AIzaSyD0kUwvkPMpssY---gQ8RySe0OnIQ7DAkU"  # Replace with your actual API Key
 genai.configure(api_key=API_KEY)
 
 # Force CPU usage
@@ -56,7 +56,7 @@ def cleanup_image(filepath):
     try:
         if os.path.exists(filepath):
             os.remove(filepath)
-            print(f"Cleaned up image: {filepath}")
+            # print(f"Cleaned up image: {filepath}")
     except Exception as e:
         print(f"Error cleaning up image {filepath}: {e}")
 
@@ -75,7 +75,7 @@ def download_image(url, save_dir="downloads"):
             for chunk in response.iter_content(1024):
                 file.write(chunk)
 
-        print(f"Image downloaded successfully: {save_path}")
+        # print(f"Image downloaded successfully: {save_path}")
         return save_path  # Return the saved image path
     else:
         print(f"Failed to download image. HTTP Status: {response.status_code}")
@@ -116,7 +116,7 @@ def extract_text_from_image(image_path):
         if not extracted_text:  # Ensure 'notext' is returned when the response is empty
             extracted_text = "notext"
 
-        print("\nExtracted Text:", extracted_text)
+        # print("\nExtracted Text:", extracted_text)
         return extracted_text
     except Exception as e:
         print("Error extracting text:", e)

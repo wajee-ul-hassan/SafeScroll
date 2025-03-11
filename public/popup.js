@@ -167,18 +167,34 @@ document.addEventListener("DOMContentLoaded", () => {
                     action: "startImageCollection",
                     isSubscribed,
                     username
+                }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        console.error('Error starting collection:', chrome.runtime.lastError);
+                        // Revert checkbox state if there's an error
+                        checkbox.checked = false;
+                        chrome.storage.local.set({ checkboxState: false });
+                    }
                 });
             } catch (error) {
                 console.error('Error fetching subscription status:', error);
             }
         } else {
             // Stop image collection when unchecked
+            console.log("Stopping image collection");
             chrome.runtime.sendMessage({
                 action: "stopImageCollection"
+            }, (response) => {
+                if (chrome.runtime.lastError) {
+                    console.error('Error stopping collection:', chrome.runtime.lastError);
+                } else if (response.status === 'error') {
+                    console.error('Failed to stop collection:', response.message);
+                } else {
+                    console.log("Image collection stopped successfully");
+                }
             });
-            console.log("Image collection disabled.");
         }
     });
+    
 });
 
 
