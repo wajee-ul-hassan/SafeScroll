@@ -1,47 +1,128 @@
-# SafeScroll  
+# SafeScroll - Image Blur Detection System
 
-**SafeScroll** is a browser extension developed as a **Final Year Project** by three undergraduate students:  
+A system that detects potentially harmful or inappropriate images and applies blurring to them.
+![image](https://github.com/user-attachments/assets/32a7c7b9-e502-492e-86ce-e397573c188c)
 
-**Wajee Ul Hassan**  
-**Om Parkash**  
-**Afaq Ahmed**  
+![image](https://github.com/user-attachments/assets/41a71a30-d16b-4784-8be0-acdda9139d7d)
 
-This project represents the **implementation of the research conducted in our undergraduate thesis**, focusing on detecting and mitigating hateful memes on social media platforms to promote a safer digital environment.
 
----
 
-## Overview  
+https://github.com/user-attachments/assets/a538c049-8fa3-41e1-afaa-10522e4692b3
 
-**SafeScroll** is a Chrome browser extension designed to automatically detect and blur hateful memes on webpages.  
-It uses a machine learning model to analyze image content in real time, identify potential hate-related material, and blur the flagged content to protect users from exposure to harmful memes.
 
----
 
-## Features  
+https://github.com/user-attachments/assets/d3476de8-cead-4be4-ab4a-f27675737c00
 
-- **Hateful Meme Detection** — Scans all webpage images and identifies potentially hateful or offensive memes using a machine learning model.  
-- **Blur Blocking** — Automatically blurs flagged images to prevent exposure to unwanted content.  
-- **User Dashboard** — Paid users can view statistics and logs of memes blocked over time.  
-- **Authentication & Subscription** — Includes sign-in and sign-up functionality and subscription management for premium features.  
-- **Seamless DOM Integration** — Integrates with the webpage DOM to intercept and analyze images dynamically while browsing.  
 
----
+## Features
+- Detects potentially harmful or inappropriate content in images
+- Uses deep learning models for image and text analysis
+- Provides real-time image processing
+- Easy to integrate into existing applications
 
-## Technology Stack  
+## Prerequisites
 
-| Component | Technology |
-|------------|-------------|
-| **Backend** | Node.js with EJS |
-| **Frontend** | HTML, CSS, JavaScript |
-| **Machine Learning Model** | Deployed on backend for hateful meme classification |
-| **Extension API** | Chrome Extension Manifest V3 |
+- Python 3.8 or higher
+- Node.js (for frontend development)
+- Git
 
----
+## Installation
 
-## Installation and Setup  
+1. Clone the repository:
+```bash
+git clone https://github.com/afaq-ahmed07/SafeScroll.git
+cd SafeScroll
+```
 
-Follow these steps to set up **SafeScroll** locally:
+2. Install Python dependencies:
+```bash
+# Navigate to python-model directory
+cd python-model
+pip install -r requirements.txt
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-username/safescroll-extension.git
+3. Set up environment variables:
+```bash
+cd ..
+# Create a .env file (example provided in .env.example)
+touch .env
+```
+
+4. Build the frontend:
+```bash
+# Navigate to public directory
+cd public
+npm install
+npm run build
+```
+
+## Running the Application
+
+1. Start the Python backend:
+```bash
+cd python-model
+python app.py
+```
+The backend will run on http://localhost:5000
+
+2. Start the frontend (optional):
+```bash
+cd ../public
+npm start
+```
+The frontend will run on http://localhost:3000
+
+## API Endpoints
+
+### Image Prediction
+```http
+POST /predict
+```
+
+Request Body:
+```json
+{
+    "image_url": "URL_TO_IMAGE"
+}
+```
+
+Response:
+```json
+{
+    "prediction": 0,  # 0 for safe, 1 for unsafe
+    "confidence": 0.95
+}
+```
+
+## Project Structure
+
+```
+SafeScroll/
+├── python-model/          # Backend Python code
+│   ├── app.py           # Flask server
+│   ├── predict_DualBranch.py  # Prediction model
+│   ├── fe.py            # Feature extraction
+│   └── requirements.txt  # Python dependencies
+├── public/              # Frontend code
+│   ├── background.js    # Browser extension background script
+│   └── content.js       # Browser extension content script
+└── .env                 # Environment variables
+```
+
+## Usage
+
+1. The system can be used as a standalone API service
+2. It can be integrated into browser extensions
+3. It can be used to process images in batch mode
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
